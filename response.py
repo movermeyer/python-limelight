@@ -96,6 +96,9 @@ Appendix A – Response Codes and Meanings
 1000 – Could not add record
 """
 
+import urlparse
+
+from limelight.errors import LimeLightException
 from limelight.utils import to_underscore, to_python
 
 
@@ -103,9 +106,12 @@ class Response(object):
     """
     Supposed to make working with Lime Light's responses nicer.
     """
-    def __init__(self, **kwargs):
-        for k, v in kwargs:
+    def __init__(self, lime_light_request):
+        lime_light_response = lime_light_request.read()
+        for k, v in urlparse.parse_qs(lime_light_response).iteritems():
             setattr(self, to_underscore(k), to_python(v))
+        if self.is_success() is False:
+            raise LimeLightException(self.response_code)
 
     def is_success(self):
         if hasattr(self, 'response_code') and self.response_code == 100:

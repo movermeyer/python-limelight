@@ -2,8 +2,8 @@
 
 import re
 
-CAMEL_RE = re.compile(r'(ID|[A-Z])')
-UNDER_RE = re.compile(r'_(id|[a-z])')
+CAMEL_RE = re.compile(r'([A-Z])')
+UNDER_RE = re.compile(r'_([a-z])')
 NUM_RE = re.compile(r'[0-9]+')
 FLOAT_RE = re.compile(r'[0-9]*?\.[0-9]+')
 
@@ -35,7 +35,10 @@ def to_python(var):
     May be more generic in the future
     :param var:
     """
-    if NUM_RE.match(var):
+    var = var[0] if isinstance(var, list) else var
+    if not isinstance(var, str):
+        return var
+    elif NUM_RE.match(var):
         return int(var)
     elif FLOAT_RE.match(var):
         return float(var)
