@@ -7,7 +7,8 @@ import urllib2
 from limelight.response import Response
 from limelight.errors import (ImproperlyConfigured,
                               RequestError,
-                              NoPreviousOrder, )
+                              NoPreviousOrder,
+                              TransactionDeclined)
 from limelight.utils import to_camel_case
 
 
@@ -90,7 +91,7 @@ class Transaction(object):
                                                       product=order.product,
                                                       campaign_id=order.campaign_id)
         if not response.is_success():
-            raise
+            raise Exception  # TODO: be more specific
         new_order.update(auth_data)
         address = new_order.pop('address', None)
         for k, v in address.__dict__.iteritems():
@@ -101,6 +102,8 @@ class Transaction(object):
         for k, v in partial_.__dict__.iteritems():
             if k in self.tracking_keys:
                 new_order[self.tracking_map[k]] = v
+        if response.transaction_id:
+            new_order['transaction_id'] = response.transaction_id
         if 'transaction_id' in partial_ and partial_['transaction_id'] is not None:
             new_order['transaction_id'] = partial_['transaction_id']
         new_order['tran_type'] = 'Sale'

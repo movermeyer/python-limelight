@@ -2,8 +2,8 @@
 
 import re
 
-CAMEL_RE = re.compile(r'([A-Z])')
-UNDER_RE = re.compile(r'_([a-z])')
+CAMEL_RE = re.compile(r'(ID|[A-Z])')
+UNDER_RE = re.compile(r'_(id|[a-z])')
 NUM_RE = re.compile(r'[0-9]+')
 FLOAT_RE = re.compile(r'[0-9]*?\.[0-9]+')
 
