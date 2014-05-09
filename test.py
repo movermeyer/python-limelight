@@ -6,6 +6,8 @@ from limelight.utils import (to_camel_case,
                              to_underscore,
                              _initial_cap)
 
+from limelight.transaction.maps import Map
+
 
 class TestUtils(TestCase):
     def setUp(self):
@@ -28,3 +30,18 @@ class TestUtils(TestCase):
     def test__initial_cap(self):
         self.assertEqual(_initial_cap(self.underscore_name), self.initial_cap_underscore_name)
         self.assertEqual(_initial_cap(self.camel_name), self.initial_cap_camel_name)
+
+
+class TestMaps(TestCase):
+    def setUp(self):
+        self.a_to_b = Map(a='b')
+        self.a_to_b_to_bb = Map(a=('b', lambda v: v + v))
+
+    def test_a_to_b(self):
+        """Map a to b"""
+        self.assertEqual(self.a_to_b('a'), 'b')
+
+    def test_a_to_bb(self):
+        """Map a to b and convert b to bb"""
+        self.assertEqual(self.a_to_b_to_bb('a', 'b')[0], 'b')
+        self.assertEqual(self.a_to_b_to_bb('a', 'b')[1], 'bb')

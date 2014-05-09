@@ -4,8 +4,12 @@ import urllib
 import urllib2
 
 from limelight.response import Response
+
 from limelight.errors import ImproperlyConfigured
+
 from limelight.utils import to_camel_case
+
+from limelight.transaction import maps
 
 
 class Transaction(object):
@@ -30,65 +34,6 @@ class Transaction(object):
         'campaign_id', 'date', 'payment_method', 'shipping_address', 'quantity'
     )
     request_string = "{endpoint}/admin/transact.php?{query_string}".format
-
-    # Map local tracking names to Lime Light names
-    tracking_map = {
-        'offer_id': 'C1',
-        'affiliate_id': 'AFID',
-        'affiliate_sub_id': 'SID',
-        'affiliate_sub_id2': 'AID'
-    }
-
-    @property
-    def tracking_keys(self):
-        for k in self.tracking_map.iterkeys():
-            yield k
-
-    # Map local credit card field names to Lime Light names
-    credit_card_map = {
-        'first_name': 'billing_first_name',
-        'last_name': 'billing_last_name',
-        'type': 'credit_card_type',
-        'number': 'credit_card_number',
-        'expires': 'expiration_date',
-        'ccv': 'CVV'
-    }
-
-    @property
-    def credit_card_keys(self):
-        for k in self.credit_card_map.iterkeys():
-            yield k
-
-    # Map local address field names to Lime Light names
-    address_map = {
-        'first_name': 'first_name',
-        'last_name': 'last_name',
-        'street': 'address1',
-        'city': 'city',
-        'state': 'state',
-        '_state': 'state',
-        'postal_code': 'zip',
-        'country': 'country'
-    }
-
-    @property
-    def address_keys(self):
-        for k in self.address_map.iterkeys():
-            yield k
-
-    # Map local customer field name to Lime Light names
-    customer_map = {
-        'first_name': 'first_name',
-        'last_name': 'last_name',
-        'phone_number': 'phone',
-        'email_address': 'email',
-        'ip_address': 'ip_address'
-    }
-
-    @property
-    def customer_keys(self):
-        for k in self.customer_map.iterkeys():
-            yield k
 
     def __request(self, method, convert_method=True, **kwargs):
         """
@@ -121,17 +66,23 @@ class Transaction(object):
         customer = new_order.pop('customer', order.customer)
         credit_card = new_order.pop('payment_method', order.payment_method)
         response, auth_data = self._authorize_payment(customer, credit_card,
+                                                      ip_address=order.ip_address,
                                                       product=order.product,
-                                                      campaign_id=order.campaign_id)
+                                                      campaign=order.campaign)
         new_order.update(auth_data)
+        # Process shipping information
         address = new_order.pop('shipping_address', order.shipping_address)
         for k, v in address.__dict__.iteritems():
             if not k in ('id', ):
-                new_order['shipping_' + self.address_map[k]] = v
+                key, value = maps.address(k, v)
+                new_order['shipping_' + key] = value
+        # Process partial data
         partial_ = customer.partial
         for k, v in partial_.__dict__.iteritems():
-            if k in self.tracking_keys:
-                new_order[self.tracking_map[k]] = v
+            if k in maps.tracking.keys():
+                key, value = maps.tracking(k, v)
+                new_order[key] = value
+        # Determine transaction ID
         if hasattr(response, 'transaction_id'):
             new_order['transaction_id'] = response.transaction_id
         elif 'transaction_id' in partial_.__dict__ and partial_.__dict__['transaction_id'] is not None:
@@ -149,11 +100,10 @@ class Transaction(object):
         :param previous_order_id:
         :param list upsell:
         """
-        if not all((product, previous_order_id, partial)):
-            raise ValueError("All arguments are required!")
-        new_order = {self.tracking_map[k]: v for k, v in partial.__dict__.iteritems() if k in self.tracking_keys}
+        new_order = {maps.tracking(k)[0]: maps.tracking(k, v)[1] for k, v in partial.__dict__.iteritems() if k in maps.tracking.keys()}
         new_order['product_id'] = product
         new_order['previous_order_id'] = previous_order_id
+        new_order['upsell'] = upsell
         return self.__request('new_order_card_on_file', **new_order)
 
     def new_order_with_prospect(self):
@@ -161,30 +111,31 @@ class Transaction(object):
         """
         raise NotImplementedError
 
-    def _authorize_payment(self, customer, credit_card, product=None, campaign_id=None):
+    def _authorize_payment(self, customer, credit_card, ip_address=None, product=None, campaign=None):
         """
         Authorize payment
 
         :param bizopp.models.User customer:
         :param careers.models.CreditCard credit_card:
         :param careers.models.Product product:
-        :param int campaign_id:
+        :param int campaign:
         """
         new_authorization = {}
         for k, v in customer.__dict__.iteritems():
-            if k in ('phone_number', 'email_address', 'ip_address', ):
-                new_authorization[self.customer_map[k]] = v
+            if k in ('first_name', 'last_name', 'phone_number', 'email_address', ):
+                key, value = maps.customer(k, v)
+                new_authorization[key] = value
         for k, v in credit_card.__dict__.iteritems():
-            if k in self.credit_card_keys:
-                if k == 'expires':
-                    value = v.strftime("%m%y")
-                else:
-                    value = v
-                new_authorization[self.credit_card_map[k]] = value
+            if k in maps.credit_card.keys():
+                key, value = maps.credit_card(k, v)
+                new_authorization[key] = value
         for k, v in credit_card.billing_address.__dict__.iteritems():
             if not k in ('id', ):
-                new_authorization['billing_' + self.address_map[k]] = v
+                key, value = maps.address(k, v)
+                new_authorization['billing_' + key] = value
+        new_authorization['ip_address'] = ip_address
         new_authorization['product_id'] = product.id
-        new_authorization['campaign_id'] = campaign_id
+        new_authorization['campaign_id'] = campaign.id
+        new_authorization['shipping_id'] = campaign.shipping_method.id
         response = self.__request('authorize_payment', convert_method=False, **new_authorization)
         return response, new_authorization

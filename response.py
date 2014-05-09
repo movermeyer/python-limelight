@@ -97,8 +97,9 @@ Appendix A – Response Codes and Meanings
 """
 
 import urlparse
+import socket
 
-from limelight.errors import LimeLightException
+from limelight.errors import (LimeLightException, TransactionDeclined, )
 from limelight.utils import to_underscore, to_python
 
 
@@ -107,12 +108,20 @@ class Response(object):
     Supposed to make working with Lime Light's responses nicer.
     """
     def __init__(self, lime_light_request):
-        lime_light_response = lime_light_request.read()
+        try:
+            lime_light_response = lime_light_request.read()
+        except socket.timeout:
+            try:
+                lime_light_response = lime_light_request.read()
+            except socket.timeout:
+                raise LimeLightException("Request timed out, try again in a few minutes.")
         for k, v in urlparse.parse_qs(lime_light_response).iteritems():
             setattr(self, to_underscore(k), to_python(v))
         if self.is_success() is False:
-            raise LimeLightException(self.response_code)
+            if self.response_code == 800:
+                raise TransactionDeclined(self.decline_reason)
+            else:
+                raise LimeLightException(self.response_code)
 
     def is_success(self):
-        if hasattr(self, 'response_code') and self.response_code == 100:
-            return True
+        return (hasattr(self, 'response_code') and self.response_code == 100)
