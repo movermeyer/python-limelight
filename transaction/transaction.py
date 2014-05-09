@@ -4,11 +4,8 @@ import urllib
 import urllib2
 
 from limelight.response import Response
-
 from limelight.errors import ImproperlyConfigured
-
 from limelight.utils import to_camel_case
-
 from limelight.transaction import maps
 
 
@@ -74,13 +71,13 @@ class Transaction(object):
         address = new_order.pop('shipping_address', order.shipping_address)
         for k, v in address.__dict__.iteritems():
             if not k in ('id', ):
-                key, value = maps.address(k, v)
+                key, value = maps.address[k:v]
                 new_order['shipping_' + key] = value
         # Process partial data
         partial_ = customer.partial
         for k, v in partial_.__dict__.iteritems():
             if k in maps.tracking.keys():
-                key, value = maps.tracking(k, v)
+                key, value = maps.tracking[k:v]
                 new_order[key] = value
         # Determine transaction ID
         if hasattr(response, 'transaction_id'):
@@ -100,16 +97,14 @@ class Transaction(object):
         :param previous_order_id:
         :param list upsell:
         """
-        new_order = {maps.tracking(k)[0]: maps.tracking(k, v)[1] for k, v in partial.__dict__.iteritems() if k in maps.tracking.keys()}
+        new_order = {maps.tracking(k)[0]: maps.tracking[k:v][1] for k, v in partial.__dict__.iteritems() if k in maps.tracking.keys()}
         new_order['product_id'] = product
         new_order['previous_order_id'] = previous_order_id
         new_order['upsell'] = upsell
         return self.__request('new_order_card_on_file', **new_order)
 
     def new_order_with_prospect(self):
-        """
-        """
-        raise NotImplementedError
+        raise NotImplemented
 
     def _authorize_payment(self, customer, credit_card, ip_address=None, product=None, campaign=None):
         """
@@ -123,15 +118,15 @@ class Transaction(object):
         new_authorization = {}
         for k, v in customer.__dict__.iteritems():
             if k in ('first_name', 'last_name', 'phone_number', 'email_address', ):
-                key, value = maps.customer(k, v)
+                key, value = maps.customer[k:v]
                 new_authorization[key] = value
         for k, v in credit_card.__dict__.iteritems():
             if k in maps.credit_card.keys():
-                key, value = maps.credit_card(k, v)
+                key, value = maps.credit_card[k:v]
                 new_authorization[key] = value
         for k, v in credit_card.billing_address.__dict__.iteritems():
             if not k in ('id', ):
-                key, value = maps.address(k, v)
+                key, value = maps.address[k:v]
                 new_authorization['billing_' + key] = value
         new_authorization['ip_address'] = ip_address
         new_authorization['product_id'] = product.id

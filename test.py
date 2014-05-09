@@ -5,7 +5,6 @@ from django.test import TestCase
 from limelight.utils import (to_camel_case,
                              to_underscore,
                              _initial_cap)
-
 from limelight.transaction.maps import Map
 
 
@@ -39,9 +38,9 @@ class TestMaps(TestCase):
 
     def test_a_to_b(self):
         """Map a to b"""
-        self.assertEqual(self.a_to_b('a'), 'b')
+        self.assertEqual(self.a_to_b['a'], 'b')
 
     def test_a_to_bb(self):
         """Map a to b and convert b to bb"""
-        self.assertEqual(self.a_to_b_to_bb('a', 'b')[0], 'b')
-        self.assertEqual(self.a_to_b_to_bb('a', 'b')[1], 'bb')
+        self.assertEqual(self.a_to_b_to_bb['a':'b'][0], 'b')
+        self.assertEqual(self.a_to_b_to_bb['a':'b'][1], 'bb')

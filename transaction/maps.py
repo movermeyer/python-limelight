@@ -1,27 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import us
 
-class Map(object):
-    """
-    A weird object that maps local field names to lime light field name, also supports
-    value conversions.
-    """
-    def __init__(self, **kwargs):
-        self.__map = {}
-        for k, v in kwargs.iteritems():
-            self.__map[k] = v if isinstance(v, tuple) else (v, lambda x: x)
-
-    def keys(self):
-        for k in self.__map.iterkeys():
-            yield k
-
-    def __call__(self, *args):
-        map_tuple = self.__map[args[0]]
-        if len(args) == 2:
-            return map_tuple[0], map_tuple[1](args[1])
-        else:
-            return map_tuple[0]
-
+from limelight.types import Map
 
 tracking = Map(
     offer_id='C1',
@@ -44,8 +25,8 @@ address = Map(
     last_name='last_name',
     street='address1',
     city='city',
-    state='state',
-    _state='state',
+    state=('state', lambda v: us.states.lookup(v).abbr),
+    _state=('state', lambda v: us.states.lookup(v).abbr),
     postal_code='zip',
     country='country'
 )
