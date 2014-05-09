@@ -21,7 +21,12 @@ class Map(object):
 
     def __getitem__(self, item):
         if isinstance(item, slice):
-            key, value = item.start, item.stop
-            return self.__map[key][0], self.__map[key][1](value)
-        else:
+            try:
+                key, value = item.start, item.stop
+                return self.__map[key][0], self.__map[key][1](value)
+            except:
+                return key, value
+        elif item in self.__map:
             return self.__map[item][0]
+        else:
+            return item
