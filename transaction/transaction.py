@@ -75,14 +75,15 @@ class Transaction(object):
                 new_order['shipping_' + key] = value
         # Process partial data
         partial_ = customer.partial
-        for k, v in partial_.__dict__.iteritems():
-            if k in maps.tracking.keys():
-                key, value = maps.tracking[k:v]
-                new_order[key] = value
+        if partial_:
+            for k, v in partial_.__dict__.iteritems():
+                if k in maps.tracking.keys():
+                    key, value = maps.tracking[k:v]
+                    new_order[key] = value
         # Determine transaction ID
         if hasattr(response, 'transaction_id'):
             new_order['transaction_id'] = response.transaction_id
-        elif 'transaction_id' in partial_.__dict__ and partial_.__dict__['transaction_id'] is not None:
+        elif partial_ and 'transaction_id' in partial_.__dict__ and partial_.__dict__['transaction_id'] is not None:
             new_order['transaction_id'] = partial_['transaction_id']
         new_order['tran_type'] = 'Sale'
         try:
