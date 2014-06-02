@@ -13,11 +13,13 @@ setup(
     version=version,
     description="A pythonic Lime Light API wrapper",
     long_description=open("README.txt", 'rb').read().decode('utf-8'),
+    url="https://bitbucket.org/zulumarketing/python-limelight",
     license=license,
     author=author,
     author_email=author_email,
-    packages=["limelight", ],
-    url="https://bitbucket.org/zulumarketing/python-limelight.git",
+    packages=[
+        "limelight",
+    ],
     classifiers=[
         "Environment :: Web Environment",
         "Topic :: Internet",
@@ -30,6 +32,6 @@ setup(
         "License :: OSI Approved :: MIT License",
     ],
     install_requires=[
-        "us".
+        "us",
     ]
 )

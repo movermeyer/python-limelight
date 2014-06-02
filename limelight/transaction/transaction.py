@@ -83,7 +83,7 @@ class Transaction(object):
         # Determine transaction ID
         if hasattr(response, 'transaction_id'):
             new_order['transaction_id'] = response.transaction_id
-        elif partial_ and 'transaction_id' in partial_.__dict__ and partial_.__dict__['transaction_id'] is not None:
+        elif partial_ and partial_.__dict__.get('transaction_id', None):
             new_order['transaction_id'] = partial_['transaction_id']
         new_order['tran_type'] = 'Sale'
         try:

@@ -25,7 +25,7 @@ address = Map(
     last_name='last_name',
     street='address1',
     city='city',
-    state=('state', lambda v: us.states.lookup(v).abbr),
+    state='state',
     postal_code='zip',
     country='country'
 )

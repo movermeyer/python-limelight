@@ -13,5 +13,5 @@ __copyright__ = "Copyright 2014, Zulu Marketing"
 __license__ = "MIT"
 __version__ = "0.0.1.dev1"
 
-from limelight.transaction.transaction import Transaction
+from limelight.transaction import Transaction
 from limelight.response import Response
