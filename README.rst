@@ -1,9 +1,12 @@
-|version|
+|build| |downloads| |version| |license|
 
 Python-LimeLight
 ================
 
 A pythonic Lime Light API wrapper
+
+.. |build| image:: https://api.shippable.com/projects/538cd86fbf7338c600069bf1/badge/master
+   :alt:
 
 .. |version| image:: https://pypip.in/version/python-limelight/badge.png
    :target: https://pypi.python.org/pypi/python-limelight/

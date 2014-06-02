@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import urllib
-import urllib2
+
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
 
 from limelight.response import Response
 from limelight.errors import ImproperlyConfigured
@@ -45,10 +49,10 @@ class Transaction(object):
         kwargs['username'] = self.username
         kwargs['password'] = self.password
         kwargs['method'] = to_camel_case(method, initial_cap=True) if convert_method else method
-        query_string = urllib.urlencode({to_camel_case(k): v for k, v in kwargs.iteritems()})
+        query_string = urllib.urlencode({to_camel_case(k): v for k, v in kwargs.items()})
         request = self.request_string(endpoint=self.endpoint,
                                       query_string=query_string)
-        return Response(urllib2.urlopen(request, timeout=7))
+        return Response(urlopen(request, timeout=7))
 
     def new_order(self, order):
         """
@@ -59,7 +63,7 @@ class Transaction(object):
 
         :param careers.models.Order order: Order information
         """
-        new_order = {k: v for k, v in order.__dict__.iteritems() if k in self.required_fields}
+        new_order = {k: v for k, v in order.__dict__.items() if k in self.required_fields}
         customer = new_order.pop('customer', order.customer)
         credit_card = new_order.pop('payment_method', order.payment_method)
         response, auth_data = self._authorize_payment(customer, credit_card,
@@ -69,14 +73,14 @@ class Transaction(object):
         new_order.update(auth_data)
         # Process shipping information
         address = new_order.pop('shipping_address', order.shipping_address)
-        for k, v in address.__dict__.iteritems():
+        for k, v in address.__dict__.items():
             if not k in ('id', ):
                 key, value = maps.address[k:v]
                 new_order['shipping_' + key] = value
         # Process partial data
         partial_ = customer.partial
         if partial_:
-            for k, v in partial_.__dict__.iteritems():
+            for k, v in partial_.__dict__.items():
                 if k in maps.tracking.keys():
                     key, value = maps.tracking[k:v]
                     new_order[key] = value
@@ -96,18 +100,25 @@ class Transaction(object):
         """
         :param product:
         :param previous_order_id:
-        :param list upsell:
+        :param upsell:
+        :param partial:
         """
-        new_order = {maps.tracking(k)[0]: maps.tracking[k:v][1] for k, v in partial.__dict__.iteritems() if k in maps.tracking.keys()}
+        new_order = {maps.tracking(k)[0]: maps.tracking[k:v][1]
+                     for k, v in partial.__dict__.items() if k in maps.tracking.keys()}
         new_order['product_id'] = product
         new_order['previous_order_id'] = previous_order_id
         new_order['upsell'] = upsell
         return self.__request('new_order_card_on_file', **new_order)
 
     def new_order_with_prospect(self):
+        """
+
+        :return:
+        """
         raise NotImplemented
 
-    def _authorize_payment(self, customer, credit_card, ip_address=None, product=None, campaign=None):
+    def _authorize_payment(self, customer, credit_card,
+                           ip_address=None, product=None, campaign=None):
         """
         Authorize payment
 
@@ -117,15 +128,15 @@ class Transaction(object):
         :param int campaign:
         """
         new_authorization = {}
-        for k, v in customer.__dict__.iteritems():
+        for k, v in customer.__dict__.items():
             if k in ('first_name', 'last_name', 'phone_number', 'email_address', ):
                 key, value = maps.customer[k:v]
                 new_authorization[key] = value
-        for k, v in credit_card.__dict__.iteritems():
+        for k, v in credit_card.__dict__.items():
             if k in maps.credit_card.keys():
                 key, value = maps.credit_card[k:v]
                 new_authorization[key] = value
-        for k, v in credit_card.billing_address.__dict__.iteritems():
+        for k, v in credit_card.billing_address.__dict__.items():
             if not k in ('id', ):
                 key, value = maps.address[k:v]
                 new_authorization['billing_' + key] = value

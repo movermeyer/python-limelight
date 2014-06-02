@@ -96,7 +96,10 @@ Appendix A – Response Codes and Meanings
 1000 – Could not add record
 """
 
-import urlparse
+try:
+    from urllib.parse import parse_qs
+except ImportError:
+    from urlparse import parse_qs
 import socket
 
 from limelight.errors import (LimeLightException, TransactionDeclined, )
@@ -115,7 +118,7 @@ class Response(object):
                 lime_light_response = lime_light_request.read()
             except socket.timeout:
                 raise LimeLightException("Request timed out, try again in a few minutes.")
-        for k, v in urlparse.parse_qs(lime_light_response).iteritems():
+        for k, v in parse_qs(lime_light_response).items():
             setattr(self, to_underscore(k), to_python(v))
         if self.is_success() is False:
             if self.response_code == 800:
@@ -124,4 +127,4 @@ class Response(object):
                 raise LimeLightException(self.response_code)
 
     def is_success(self):
-        return (hasattr(self, 'response_code') and self.response_code == 100)
+        return all((hasattr(self, 'response_code'), self.response_code == 100))

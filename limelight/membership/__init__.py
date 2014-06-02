@@ -1,1 +1,1 @@
-__author__ = 'carloskillpack'
+# -*- coding: utf-8 -*-
