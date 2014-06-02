@@ -12,7 +12,7 @@ setup(
     name="python-limelight",
     version=version,
     description="A pythonic Lime Light API wrapper",
-    long_description=open("README.txt", 'rb').read().decode('utf-8'),
+    long_description=open("README.rst", 'rb').read().decode('utf-8'),
     url="https://bitbucket.org/zulumarketing/python-limelight",
     license=license,
     author=author,
