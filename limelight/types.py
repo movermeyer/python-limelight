@@ -23,7 +23,7 @@ class Map(object):
         if isinstance(item, slice):
             key, value = item.start, item.stop
             try:
-                return self.__map[key][0], self.__map[key][1](value)
+                return self.__map[key][0], self.__map[key][1](value)  # TODO something more sensible
             except:
                 return key, value
         elif item in self.__map:

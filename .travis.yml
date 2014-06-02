@@ -8,4 +8,7 @@ python:
 install:
     - pip install .
     - pip install nose coverage
-script: nosetests --with-coverage --cover-package=limelight
+before_script: mkdir -p shippable/testresults
+script:
+    - nosetests --with-coverage --cover-package=limelight --with-xunit --xunit-file=shippable/testresults/nosetests.xml
+    - coverage xml -o shippable/codecoverage/coverage.xml
