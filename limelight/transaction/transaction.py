@@ -2,11 +2,6 @@
 
 import urllib
 
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib2 import urlopen
-
 from limelight.response import Response
 from limelight.errors import ImproperlyConfigured
 from limelight.utils import to_camel_case
@@ -52,7 +47,7 @@ class Transaction(object):
         query_string = urllib.urlencode({to_camel_case(k): v for k, v in kwargs.items()})
         request = self.request_string(endpoint=self.endpoint,
                                       query_string=query_string)
-        return Response(urlopen(request, timeout=7))
+        return Response(request)
 
     def new_order(self, order):
         """
@@ -60,6 +55,11 @@ class Transaction(object):
 
         Takes a local order object, pulls out, and formats the information. All of that is sent to
         ```__request``` which makes the Lime Light method call.
+
+        As we make progress on building out this library we'll need to loose our dependence on the
+        bizopp Order model. Doing so will drastically simplify everything as we will no longer be
+        munging data inside method calls. Instead we can expect a dict of a certain shape, validate
+        what we can and throw an exception if things don't work out.
 
         :param careers.models.Order order: Order information
         """

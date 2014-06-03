@@ -27,6 +27,8 @@ setup(
         "License :: OSI Approved :: MIT License",
     ],
     install_requires=[
+        "pycountry",
         "us",
+        "six",
     ]
 )
