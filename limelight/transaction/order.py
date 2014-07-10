@@ -14,6 +14,11 @@ class BaseOrder(type):
 
 class Order(object):
     """
-    An order object, probably a mixin eventually.
+    An order object
     """
-    pass
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    def submit(self, use_auth=False, card_on_file=False, has_prospect=False):
+        pass
