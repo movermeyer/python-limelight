@@ -5,14 +5,15 @@ try:
 except ImportError:
     from urlparse import parse_qs
 
-from .transaction_method import TransactionMethod
+from ..method import TransactionMethod
+from .. import validations
 
 
 class ThreeDRedirect(TransactionMethod):
     def parse_response(self, response):
         self.__save_response_data({k: v for k, v in parse_qs(response).items()})
 
-    validate = {'order_id': lambda x: isinstance(x, int)}
+    validate = {'order_id': validations.is_numeric(0)}
 
     @property
     def __name__(self):
