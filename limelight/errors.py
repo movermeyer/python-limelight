@@ -21,5 +21,5 @@ class TransactionDeclined(LimeLightException):
     pass
 
 
-class ValidationError(Exception):
+class ValidationError(LimeLightException):
     pass

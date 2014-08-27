@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from . import utils
-import membership
-import transaction
+from .utils import not_implemented
+from . import membership, transaction
 
 
-class Client(object):
+class BaseClient(object):
     """
     A Lime Light API client object.
     """
-    method_package = property(utils.not_implemented)
+    __method_package = not_implemented
 
     def __init__(self, host, username, password):
         self.host = host
@@ -17,8 +16,7 @@ class Client(object):
         self.password = password
 
     def __getattr__(self, item):
-        method_class = getattr(transaction, item, None)
-        method_class = getattr(membership, item) if method_class is None else method_class
+        method_class = getattr(self.__method_package, item, None)
         if method_class is None:
             raise AttributeError
         setattr(method_class, 'host', self.host)
@@ -26,3 +24,10 @@ class Client(object):
         setattr(method_class, 'password', self.password)
         return method_class
 
+
+class MembershipClient(BaseClient):
+    __method_package = membership
+
+
+class TransactionClient(BaseClient):
+    __method_package = transaction
