@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from . import membership, transaction
-from .. import utils
+from . import utils
+import membership
+import transaction
 
 
 class Client(object):
@@ -16,16 +17,12 @@ class Client(object):
         self.password = password
 
     def __getattr__(self, item):
-        method_class = getattr(self.method_package, item)
+        method_class = getattr(transaction, item, None)
+        method_class = getattr(membership, item) if method_class is None else method_class
+        if method_class is None:
+            raise AttributeError
         setattr(method_class, 'host', self.host)
         setattr(method_class, 'username', self.username)
         setattr(method_class, 'password', self.password)
         return method_class
 
-
-class Membership(Client):
-    method_package = membership
-
-
-class Transaction(Client):
-    method_package = transaction

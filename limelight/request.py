@@ -5,16 +5,18 @@ try:
 except ImportError:
     from urllib2 import urlopen
 
+# noinspection PyPep8Naming
 from socket import timeout as Timeout
 from ssl import SSLError
 
 from copy import copy
 
-from .. import utils
-from .error import ValidationError
+from . import utils
+from .errors import ValidationError
+from .mixins import ConversionsMixin, FieldsMixin
 
 
-class Request(object):
+class Request(ConversionsMixin, FieldsMixin):
     TIMEOUT = 12
     MAX_TRIES = 3
 
@@ -33,10 +35,11 @@ class Request(object):
         for k, v in data.items():
             setattr(self, utils.to_underscore(k), utils.to_python(v))
 
+    # noinspection PyCallingNonCallable
     def __convert_data(self, data):
         converted_data = {}
         for key, value in data.items():
-            conversion_func = getattr(self, "convert_{field}".format(field=key), None)
+            conversion_func = getattr(self, "convert__{field}".format(field=key), None)
             if key in self.unconverted_field_labels and conversion_func is None:
                 converted_data[key] = value
             elif key in self.unconverted_field_labels and conversion_func is not None:
@@ -64,12 +67,3 @@ class Request(object):
             else:
                 raise Exception
 
-    endpoint = property(utils.not_implemented)
-    error = property(utils.not_implemented)
-    validate = property(utils.not_implemented)
-    username = property(utils.not_implemented)
-    password = property(utils.not_implemented)
-    unconverted_field_labels = property(utils.not_implemented)
-
-    def parse_response(self, response):
-        raise NotImplementedError

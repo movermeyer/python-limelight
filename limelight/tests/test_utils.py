@@ -2,9 +2,9 @@
 
 from unittest import TestCase
 
-from limelight.utils import (to_camel_case,
-                             to_underscore,
-                             _initial_cap)
+from ..utils import (to_camel_case,
+                     to_underscore,
+                     initial_cap)
 
 
 class TestUtils(TestCase):
@@ -26,5 +26,5 @@ class TestUtils(TestCase):
                          self.initial_cap_underscore_name)
 
     def test__initial_cap(self):
-        self.assertEqual(_initial_cap(self.underscore_name), self.initial_cap_underscore_name)
-        self.assertEqual(_initial_cap(self.camel_name), self.initial_cap_camel_name)
+        self.assertEqual(initial_cap(self.underscore_name), self.initial_cap_underscore_name)
+        self.assertEqual(initial_cap(self.camel_name), self.initial_cap_camel_name)

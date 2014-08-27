@@ -22,6 +22,7 @@ class AuthorizePayment(TransactionMethod):
                 'email': validations.is_email_address(96),
                 'credit_card_type': validations.is_accepted_payment_type,
                 'credit_card_number': validations.is_valid_credit_card_number(20),
+                'expiration_date': validations.is_datetime,
                 'cvv': validations.is_numeric(4),
                 'ip_address': validations.is_valid_ip_address(15),
                 'product_id': validations.is_numeric(),

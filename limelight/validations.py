@@ -2,6 +2,8 @@
 
 import re
 
+from datetime import datetime
+
 from validate_email import validate_email
 
 import decorator
@@ -12,7 +14,7 @@ import pycountry
 
 __all__ = ['is_numeric', 'is_alphanumeric', 'is_accepted_payment_type', 'is_email_address',
            'is_boolean', 'is_decimal', 'is_valid_country_code', 'is_valid_credit_card_number',
-           'is_valid_ip_address', ]
+           'is_valid_ip_address', 'is_datetime']
 
 ALPHANUMERIC_RE = re.compile(r'^(?:[\w ](?!_))+$')
 NUMERIC_RE = re.compile(r'^[0-9]+$')
@@ -25,8 +27,13 @@ CREDIT_CARD_RE = re.compile(r'''^(?:4[0-9]{12}(?:[0-9]{3})?
                                    |(?:2131|1800|35\\d{3})\d{11})$''',
                             re.X)
 
+
 @decorator.decorator
 def check_length():
+    """
+    Eliminates duplicate logic for field-length checking.
+    :return:
+    """
     pass
 
 
@@ -101,15 +108,40 @@ def is_valid_ip_address(length=None):
 
 
 def is_decimal(number, decimal_re=DECIMAL_RE):
+    """
+    Verifies that the given number is a valid decimal
+    :param number:
+    :param decimal_re:
+    :return:
+    """
     return bool(re.match(decimal_re, number))
 
 
 def is_boolean(value):
+    """
+    Verifies that the given value is a boolean
+    :param value:
+    :return:
+    """
     return isinstance(value, bool)
 
 
 def is_valid_country_code(country_code):
+    """
+    Verifies that the given two-letter country code is valid.
+    :param country_code:
+    :return:
+    """
     try:
         return bool(pycountry.countries.get(alpha2=country_code))
     except KeyError:
         return False
+
+
+def is_datetime(obj):
+    """
+    Verifies that the given object represents a date.
+    :param obj:
+    :return:
+    """
+    return isinstance(obj, datetime)
