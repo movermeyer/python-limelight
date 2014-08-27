@@ -2,9 +2,7 @@
 
 from unittest import TestCase
 
-from ..utils import (to_camel_case,
-                     to_underscore,
-                     initial_cap)
+from limelight.utils import to_camel_case, to_underscore, initial_cap
 
 
 class TestUtils(TestCase):
