@@ -2,19 +2,17 @@
 
 import re
 
-from datetime import datetime
+from datetime import datetime as datetime_
 
 from validate_email import validate_email
-
-import decorator
 
 import ipaddress
 
 import pycountry
 
-__all__ = ['is_numeric', 'is_alphanumeric', 'is_accepted_payment_type', 'is_email_address',
-           'is_boolean', 'is_decimal', 'is_valid_country_code', 'is_valid_credit_card_number',
-           'is_valid_ip_address', 'is_datetime']
+__all__ = ['numeric', 'alphanumeric', 'accepted_payment_type', 'email_address',
+           'boolean', 'decimal', 'valid_country_code', 'valid_credit_card_number',
+           'valid_ip_address', 'datetime']
 
 ALPHANUMERIC_RE = re.compile(r'^(?:[\w ](?!_))+$')
 NUMERIC_RE = re.compile(r'^[0-9]+$')
@@ -28,52 +26,19 @@ CREDIT_CARD_RE = re.compile(r'''^(?:4[0-9]{12}(?:[0-9]{3})?
                             re.X)
 
 
-@decorator.decorator
-def check_length():
-    """
-    Eliminates duplicate logic for field-length checking.
-    :return:
-    """
-    pass
-
-
-def is_alphanumeric(length=None):
-    """
-    Verifies that the given value of a specified length contains only letters and numbers.
-    """
-    def _is_alphanumeric(string, alphanumeric_re=ALPHANUMERIC_RE):
-        if len(string) == length or length is None:
-            return bool(re.match(alphanumeric_re, string))
-        else:
-            return False
-    return _is_alphanumeric
-
-
-def is_numeric(length=None):
-    """
-    Verifies that a given value of a specified length contains only numbers.
-    """
-    def _is_numeric(number, numeric_re=NUMERIC_RE):
-        if len(str(number)) == length or length is None:
-            return bool(re.match(numeric_re, str(number)))
-        else:
-            return False
-    return _is_numeric
-
-
-def is_email_address(length=None):
+def email_address(length=None):
     """
     Verifies that a given value of a specified length is a valid RFC 2822 email address
     """
-    def _is_email_address(email_address):
+    def _email_address(email_address):
         if len(email_address) == length or length is None:
             return validate_email(email_address)
         else:
             return False
-    return _is_email_address
+    return _email_address
 
 
-def is_accepted_payment_type(credit_card_type):
+def accepted_payment_type(credit_card_type):
     """
     Verifies that the given payment type is supported by Lime Light
     """
@@ -82,32 +47,32 @@ def is_accepted_payment_type(credit_card_type):
                                      'hipercard', 'aura', 'eft_germany', 'giro'})
 
 
-def is_valid_credit_card_number(length=None):
+def valid_credit_card_number(length=None):
     """
     Verifies that the given credit card number is valid.
     """
-    def _is_valid_credit_card_number(number, credit_card_re=CREDIT_CARD_RE):
+    def _valid_credit_card_number(number, credit_card_re=CREDIT_CARD_RE):
         if len(number) == length or length is None:
             return bool(re.match(credit_card_re, number))
         else:
             return False
-    return _is_valid_credit_card_number
+    return _valid_credit_card_number
 
 
-def is_valid_ip_address(length=None):
+def valid_ip_address(length=None):
     """
     Verifies that the given IP address is valid.
     """
-    def _is_valid_ip_address(ip_address):
+    def _valid_ip_address(ip_address):
         if len(ip_address) == length or length is None:
             return isinstance(ipaddress.ip_address(ip_address), (ipaddress.IPv4Address,
                                                                  ipaddress.IPv6Address))
         else:
             return False
-    return _is_valid_ip_address
+    return _valid_ip_address
 
 
-def is_decimal(number, decimal_re=DECIMAL_RE):
+def decimal(number, decimal_re=DECIMAL_RE):
     """
     Verifies that the given number is a valid decimal
     :param number:
@@ -117,16 +82,7 @@ def is_decimal(number, decimal_re=DECIMAL_RE):
     return bool(re.match(decimal_re, number))
 
 
-def is_boolean(value):
-    """
-    Verifies that the given value is a boolean
-    :param value:
-    :return:
-    """
-    return isinstance(value, bool)
-
-
-def is_valid_country_code(country_code):
+def valid_country_code(country_code):
     """
     Verifies that the given two-letter country code is valid.
     :param country_code:
@@ -138,10 +94,10 @@ def is_valid_country_code(country_code):
         return False
 
 
-def is_datetime(obj):
+def datetime(obj):
     """
     Verifies that the given object represents a date.
     :param obj:
     :return:
     """
-    return isinstance(obj, datetime)
+    return isinstance(obj, datetime_)

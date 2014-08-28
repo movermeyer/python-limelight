@@ -3,6 +3,7 @@
 import re
 import datetime
 
+from copy import copy
 from random import randrange
 
 from unittest import TestCase
@@ -64,6 +65,6 @@ test_order.pop('pk', None)
 class TestData(TestCase):
     def test_data_is_valid(self):
         """Validate test data"""
-        for datum in locals().values():
+        for datum in copy(locals()).values():
             if isinstance(datum, dict):
                 self.assertTrue(all(v for v in datum.values()))

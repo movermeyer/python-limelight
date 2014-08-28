@@ -1,32 +1,32 @@
 # -*- coding: utf-8 -*-
 
+from voluptuous import Schema, Required, Optional, All, Length
+
 from ..method import TransactionMethod
-from .. import validations
+from ..validation_functions import (email_address, valid_ip_address, valid_country_code,
+                                    valid_credit_card_number, accepted_payment_type,
+                                    datetime, decimal)
 
 
 class AuthorizePayment(TransactionMethod):
-    required_fields = {'billing_first_name', 'billing_last_name', 'billing_address1',
-                       'billing_address2', 'billing_city', 'billing_state', 'billing_zip',
-                       'phone', 'email', 'credit_card_type', 'credit_card_number', 'cvv',
-                       'ip_address', 'product_id', 'campaign_id'}
     unconverted_field_labels = {'auth_amount', 'cascade_enabled', 'save_customer'}
-    validate = {'billing_first_name': validations.is_alphanumeric(64),
-                'billing_last_name': validations.is_alphanumeric(64),
-                'billing_address1': validations.is_alphanumeric(64),
-                'billing_address2': validations.is_alphanumeric(64),
-                'billing_city': validations.is_alphanumeric(32),
-                'billing_state': validations.is_alphanumeric(32),
-                'billing_zip': validations.is_numeric(10),
-                'billing_country': validations.is_valid_country_code,
-                'phone': validations.is_numeric(18),
-                'email': validations.is_email_address(96),
-                'credit_card_type': validations.is_accepted_payment_type,
-                'credit_card_number': validations.is_valid_credit_card_number(20),
-                'expiration_date': validations.is_datetime,
-                'cvv': validations.is_numeric(4),
-                'ip_address': validations.is_valid_ip_address(15),
-                'product_id': validations.is_numeric(),
-                'campaign_id': validations.is_numeric(),
-                'auth_amount': validations.is_decimal,
-                'cascade_enabled': validations.is_boolean,
-                'save_customer': validations.is_boolean, }
+    schema = Schema({Required('billing_first_name'): All(str, Length(min=1, max=64)),
+                     Optional('billing_last_name'): All(str, Length(min=1, max=64)),
+                     Required('billing_address1'): All(str, Length(min=1, max=64)),
+                     Required('billing_address2'): All(str, Length(min=1, max=64)),
+                     Required('billing_city'): All(str, Length(max=32)),
+                     Required('billing_state'): All(str, Length(max=32)),
+                     Required('billing_zip'): All(int, Length(max=10)),
+                     Required('billing_country'): valid_country_code,
+                     Required('phone'): All(int, Length(max=18)),
+                     Required('email'): All(email_address, Length(max=96)),
+                     Required('credit_card_type'): All(str, accepted_payment_type),
+                     Required('credit_card_number'): All(valid_credit_card_number, Length(max=20)),
+                     Required('expiration_date'): datetime,
+                     Required('cvv'): All(int, Length(min=3, max=4)),
+                     Required('ip_address'): All(valid_ip_address, Length(max=15)),
+                     Required('product_id'): int,
+                     Required('campaign_id'): int,
+                     Optional('auth_amount'): decimal,
+                     Optional('cascade_enabled'): bool,
+                     Optional('save_customer'): bool, })

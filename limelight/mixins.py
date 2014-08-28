@@ -34,9 +34,8 @@ class ConversionsMixin(object):
 
 
 class FieldsMixin(object):
-    required_fields = not_implemented
     unconverted_field_labels = not_implemented
-    validate = not_implemented
+    schema = not_implemented
     endpoint = not_implemented
     error = not_implemented
     username = not_implemented

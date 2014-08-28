@@ -24,5 +24,6 @@ setup(name='python-limelight',
       install_requires=['decorator',
                         'validate_email',
                         'ipaddress',
+                        'voluptuous',
                         'pycountry',
                         'six', ])

@@ -12,7 +12,6 @@ from ssl import SSLError
 from copy import copy
 
 from . import utils
-from .errors import ValidationError
 from .mixins import ConversionsMixin, FieldsMixin
 
 
@@ -21,15 +20,8 @@ class Request(ConversionsMixin, FieldsMixin):
     MAX_TRIES = 3
 
     def __init__(self, **kwargs):
-        cleaned_data = {}
-        for field, validate in self.validate.items():
-            data = kwargs.get(field)
-            if data and validate(data):
-                cleaned_data[field] = kwargs[field]
-            else:
-                raise ValidationError("{field} is not valid!".format(field=field))
         self.raw_response = None
-        self.__make_request(cleaned_data)
+        self.__make_request(self.schema(kwargs))
 
     def __save_response_data(self, data):
         for k, v in data.items():
