@@ -28,6 +28,7 @@ class ConversionsMixin(object):
         """
         return datetime.strftime("%m%y")
 
+    convert__upsell_count = bool_to_1_or_0
     convert__billing_same_as_shipping = bool_to_yes_or_no
     convert__cascade_enabled = bool_to_1_or_0
     convert__save_customer = bool_to_1_or_0

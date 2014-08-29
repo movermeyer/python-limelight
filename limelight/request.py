@@ -11,6 +11,8 @@ from ssl import SSLError
 
 from copy import copy
 
+from voluptuous import Schema
+
 from . import utils
 from .mixins import ConversionsMixin, FieldsMixin
 
@@ -21,7 +23,8 @@ class Request(ConversionsMixin, FieldsMixin):
 
     def __init__(self, **kwargs):
         self.raw_response = None
-        self.__make_request(self.schema(kwargs))
+        cleaned_data = Schema(self.schema)(kwargs)
+        self.__make_request(cleaned_data)
 
     def __save_response_data(self, data):
         for k, v in data.items():
