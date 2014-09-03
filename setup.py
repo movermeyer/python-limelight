@@ -12,7 +12,7 @@ An object-oriented API wrapper for `Lime Light CRM`_
 from setuptools import setup
 
 setup(name='python-limelight',
-      version='r1.dev3',
+      version='1.dev3',
       description='A pythonic Lime Light API wrapper',
       long_description=open('README.rst', 'rb').read().decode('utf-8'),
       url='https://github.com/heropunch/python-limelight',
