@@ -1,10 +1,18 @@
 #!/usr/env python
 # -*- coding: utf-8 -*-
+"""
+python-limelight
+~~~~~~~~~~~~~~~~
+
+An object-oriented API wrapper for `Lime Light CRM`_
+
+.. _Lime Light CRM: https://www.limelightcrm.com
+"""
 
 from setuptools import setup
 
 setup(name='python-limelight',
-      version='1.dev1',
+      version='r1.dev3',
       description='A pythonic Lime Light API wrapper',
       long_description=open('README.rst', 'rb').read().decode('utf-8'),
       url='https://github.com/heropunch/python-limelight',

@@ -10,10 +10,13 @@ class BaseClient(object):
     """
     __method_package = not_implemented
 
-    def __init__(self, host, username, password):
-        self.host = host
-        self.username = username
-        self.password = password
+    def __init__(self, host=None, username=None, password=None):
+        if all([host, username, password]):
+            self.host = host
+            self.username = username
+            self.password = password
+        else:
+            raise ValueError('All arguments are required')
 
     def __getattr__(self, item):
         method_class = getattr(self.__method_package, item, None)
