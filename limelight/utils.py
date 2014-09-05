@@ -15,6 +15,7 @@ def capitalize(name):
     return name[0].upper() + name[1:]
 
 
+# noinspection PyUnusedLocal
 @property
 def not_implemented(self):
     raise NotImplementedError

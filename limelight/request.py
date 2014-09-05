@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from requests import post, get, ConnectionError, Timeout
-
 from copy import copy
 
-from voluptuous import Schema
+try:
+    # noinspection PyCompatibility
+    from urllib.parse import parse_qs
+except ImportError:
+    # noinspection PyUnresolvedReferences,PyCompatibility
+    from urlparse import parse_qs
+
+from requests import post, get, ConnectionError, Timeout
+
+from voluptuous import Schema, MultipleInvalid
 
 from . import utils, errors
 
@@ -12,8 +19,6 @@ from . import utils, errors
 class Request(object):
     """
     The superclass of all Lime Light API methods.
-
-
     """
     TIMEOUT = 12
     MAX_TRIES = 3
@@ -28,9 +33,34 @@ class Request(object):
         self.host = host
         self.username = username
         self.password = password
-        self.response = None
-        cleaned_data = Schema(self.schema)(kwargs)
-        self.__make_request(cleaned_data)
+        try:
+            cleaned_data = Schema(self.schema)(kwargs)
+        except MultipleInvalid as e:
+            raise errors.ValidationError(e)
+        self.response = self.__make_request(cleaned_data)
+        self.__process_response()
+        self.__handle_errors()
+
+    def __preprocess_data(self, unprocessed_data):
+        """
+        :param unprocessed_data: Data that is about to be send to Lime Light
+        :type unprocessed_data: dict
+        :return: Data ready to be transmitted
+        :rtype: dict
+        """
+        if self.preserve_field_labels is not None:
+            data = {}
+            for key, value in unprocessed_data.items():
+                if key in self.preserve_field_labels:
+                    data[key] = value
+                else:
+                    data[utils.to_camel_case(key)] = value
+        else:
+            data = copy(unprocessed_data)
+        data.update(method=self.__name__,
+                    username=self.username,
+                    password=self.password)
+        return data
 
     def __make_request(self, request_data, tried=0):
         """
@@ -39,38 +69,53 @@ class Request(object):
         :param tried: The number of times the request has been tried so far. By default,
                       ``__make_request`` will attempt a request three times before giving up
         :type tried: int
-        :rtype: None
+        :return: Lime Light's response
+        :rtype: requests.Response
+        :raises: requests.Timeout or requests.ConnectionError
         """
-        if self.preserve_field_labels is not None:
-            data = {}
-            for key, value in request_data.items():
-                if key in self.preserve_field_labels:
-                    data[key] = value
-                else:
-                    data[utils.to_camel_case(key)] = value
-        else:
-            data = copy(request_data)
-        data.update({'method': self.__name__,
-                     'username': self.username,
-                     'password': self.password})
+        data = self.__preprocess_data(request_data)
         try:
             if self.http_method.upper() == 'POST':
-                self.response = post(self.endpoint, data=data, timeout=self.TIMEOUT,
-                                     verify=self.VERIFY_CERT)
+                return post(self.endpoint, data=data, timeout=self.TIMEOUT, verify=self.VERIFY_CERT)
             elif self.http_method.upper() == 'GET':
-                self.response = get(self.endpoint, params=data, timeout=self.TIMEOUT,
-                                    verify=self.VERIFY_CERT)
+                return get(self.endpoint, params=data, timeout=self.TIMEOUT,
+                           verify=self.VERIFY_CERT)
             else:
-                raise errors.ImproperlyConfigured(self.__name__, '.http_method should be one of ',
-                                                  '"GET" or "POST"')
-        except (Timeout, ConnectionError):
+                msg = '`{cls}.http_method` must be one of `GET` or `POST`'.format(cls=self.__name__)
+                raise errors.ImproperlyConfigured(msg)
+        except (Timeout, ConnectionError) as e:
             if tried <= self.MAX_TRIES:
                 return self.__make_request(request_data, tried=tried + 1)
             else:
-                raise
+                raise errors.ConnectionError(e)
+
+    def __process_response(self):
+        """
+        :rtype: None
+        """
+        try:
+            response_data = self.response.json()
+        except ValueError:
+            response_data = parse_qs(self.response.text)
+        for key, value in response_data.items():
+            setattr(self, utils.to_underscore(key), utils.to_python(value))
+
+    # noinspection PyUnresolvedReferences
+    def __handle_errors(self):
+        if self.response_code == 800:
+            raise errors.TransactionDeclined(self.decline_reason)
+        else:
+            response_code = getattr(self, 'response_code', '000')
+            error_message = getattr(self, 'error_message',
+                                    'An unspecified error occurred, try again.')
+            raise errors.LimeLightException("{code}: {message}".format(code=response_code,
+                                                                       message=error_message))
 
 
 class TransactionMethod(Request):
+    """
+    Superclass of all Transaction API methods
+    """
     preserve_field_labels = {'click_id', 'preserve_force_gateway', 'thm_session_id',
                              'total_installments', 'alt_pay_token', 'alt_pay_payer_id',
                              'force_subscription_cycle', 'recurring_days', 'subscription_week',
@@ -78,15 +123,27 @@ class TransactionMethod(Request):
                              'auth_amount', 'cascade_enabled', 'save_customer', }
 
     def __init__(self, **kwargs):
-        kwargs['tran_type'] = 'Sale'
+        if self.__name__ != 'NewProspect':
+            kwargs['tran_type'] = 'Sale'
         super(TransactionMethod, self).__init__(**kwargs)
 
     @property
     def endpoint(self):
+        """
+        :return: API endpoint
+        :rtype: str
+        """
         return "https://{host}/admin/transact.php".format(host=self.host)
 
 
 class MembershipMethod(Request):
+    """
+    Superclass of all Membership API methods
+    """
     @property
     def endpoint(self):
+        """
+        :return: API endpoint
+        :rtype: str
+        """
         return "https://{host}/admin/membership.php".format(host=self.host)

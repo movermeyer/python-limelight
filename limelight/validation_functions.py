@@ -139,8 +139,8 @@ def expiration_date(date):
     """
     Verifies that the given object represents a date and that the date has not passed
 
-    :param obj: A datetime object representing an expiration date
-    :type obj: datetime.datetime
+    :param date: A datetime object representing an expiration date
+    :type date: datetime.datetime
     :return: Correctly formatted expiration date
     :rtype: str
     :raises: voluptuous.Invalid

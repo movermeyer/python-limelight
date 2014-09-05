@@ -9,7 +9,8 @@ class ImproperlyConfigured(LimeLightException):
     pass
 
 
-class RequestError(LimeLightException):
+# noinspection PyShadowingBuiltins
+class ConnectionError(LimeLightException):
     pass
 
 

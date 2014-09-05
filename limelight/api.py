@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+Lime Light API clients
+"""
 
 from functools import partial
 
@@ -28,10 +31,11 @@ class MembershipClient(BaseClient):
     The client object for accessing the Lime Light Membership API
     """
     def __getattr__(self, item):
-        method_class = getattr(membership, item, None)
-        if method_class is None:
-            raise AttributeError
-        return partial(method_class, host=self.host, username=self.username, password=self.password)
+        raise NotImplementedError
+        #method_class = getattr(membership, item, None)
+        #if method_class is None:
+        #    raise AttributeError
+        #return partial(method_class, host=self.host, username=self.username, password=self.password)
 
 
 class TransactionClient(BaseClient):
