@@ -2,7 +2,7 @@
 
 from voluptuous import Required, Optional, All, Length, Any
 
-from ..method import TransactionMethod
+from ..request import TransactionMethod
 
 
 class NewOrderCardOnFile(TransactionMethod):

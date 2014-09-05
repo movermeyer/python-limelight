@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from .utils import not_implemented
+from functools import partial
+
 from . import membership, transaction
 
 
@@ -8,9 +9,12 @@ class BaseClient(object):
     """
     A Lime Light API client object.
     """
-    __method_package = not_implemented
-
     def __init__(self, host=None, username=None, password=None):
+        """
+        :param host: Lime Light API endpoint
+        :param username: Lime Light API username
+        :param password: Lime Light API password/key/token
+        """
         if all([host, username, password]):
             self.host = host
             self.username = username
@@ -18,19 +22,24 @@ class BaseClient(object):
         else:
             raise ValueError('All arguments are required')
 
-    def __getattr__(self, item):
-        method_class = getattr(self.__method_package, item, None)
-        if method_class is None:
-            raise AttributeError
-        setattr(method_class, 'host', self.host)
-        setattr(method_class, 'username', self.username)
-        setattr(method_class, 'password', self.password)
-        return method_class
-
 
 class MembershipClient(BaseClient):
-    __method_package = membership
+    """
+    The client object for accessing the Lime Light Membership API
+    """
+    def __getattr__(self, item):
+        method_class = getattr(membership, item, None)
+        if method_class is None:
+            raise AttributeError
+        return partial(method_class, host=self.host, username=self.username, password=self.password)
 
 
 class TransactionClient(BaseClient):
-    __method_package = transaction
+    """
+    The client object for accessing the Lime Light Transaction API
+    """
+    def __getattr__(self, item):
+        method_class = getattr(transaction, item, None)
+        if method_class is None:
+            raise AttributeError
+        return partial(method_class, host=self.host, username=self.username, password=self.password)

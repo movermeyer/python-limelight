@@ -2,7 +2,7 @@
 
 from voluptuous import Required
 
-from ..method import TransactionMethod
+from ..request import TransactionMethod
 
 
 class ThreeDRedirect(TransactionMethod):

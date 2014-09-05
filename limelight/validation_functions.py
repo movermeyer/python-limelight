@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
+"""
+A collection of Lime Light-specific validation functions.
+"""
 
 import re
 
-from datetime import datetime as datetime_
+from datetime import datetime
 
-from validate_email import validate_email
+from voluptuous import Invalid
 
-import ipaddress
+from validate_email_address import validate_email
+
+import ipaddress as ipaddr
 
 import pycountry
 
-__all__ = ['numeric', 'alphanumeric', 'accepted_payment_type', 'email_address',
-           'boolean', 'decimal', 'valid_country_code', 'valid_credit_card_number',
-           'valid_ip_address', 'datetime']
+__all__ = ['email_address', 'accepted_payment_type', 'credit_card_number', 'ip_address', 'decimal',
+           'country_code', 'expiration_date', ]
 
 ALPHANUMERIC_RE = re.compile(r'^(?:[\w ](?!_))+$')
 NUMERIC_RE = re.compile(r'^[0-9]+$')
@@ -26,78 +30,144 @@ CREDIT_CARD_RE = re.compile(r'''^(?:4[0-9]{12}(?:[0-9]{3})?
                             re.X)
 
 
-def email_address(length=None):
+def email_address(email):
     """
-    Verifies that a given value of a specified length is a valid RFC 2822 email address
+    Verifies that the given value is a valid email address
+
+    :param email: An email address
+    :type email: str
+    :return: The given value
+    :rtype: str
+    :raises: voluptuous.Invalid
     """
-    def _email_address(email_address):
-        if len(email_address) == length or length is None:
-            return validate_email(email_address)
-        else:
-            return False
-    return _email_address
+    if validate_email(email):
+        return email
+    else:
+        raise Invalid("Invalid email address")
 
 
 def accepted_payment_type(credit_card_type):
     """
     Verifies that the given payment type is supported by Lime Light
+
+    :param credit_card_type: The type of credit card
+    :type credit_card_type: str
+    :return: The given values
+    :rtype: str
+    :raises: voluptuous.Invalid
     """
-    return bool(credit_card_type in {'amex', 'visa', 'master', 'discover', 'checking', 'offline',
-                                     'solo', 'maestro', 'switch', 'boleto', 'paypal', 'diners',
-                                     'hipercard', 'aura', 'eft_germany', 'giro'})
+    if credit_card_type.lower() in {'amex', 'visa', 'master', 'discover', 'checking', 'offline',
+                                    'solo', 'maestro', 'switch', 'boleto', 'paypal', 'diners',
+                                    'hipercard', 'aura', 'eft_germany', 'giro'}:
+        return credit_card_type.lower()
+    else:
+        raise Invalid("Invalid payment type")
 
 
-def valid_credit_card_number(length=None):
+def credit_card_number(number, credit_card_re=CREDIT_CARD_RE):
     """
     Verifies that the given credit card number is valid.
+
+    :param number: A credit card number
+    :type number: str
+    :param credit_card_re: CONSTANT
+    :type credit_card_re: _sre.SRE_Pattern
+    :raises: voluptuous.Invalid
     """
-    def _valid_credit_card_number(number, credit_card_re=CREDIT_CARD_RE):
-        if len(number) == length or length is None:
-            return bool(re.match(credit_card_re, number))
-        else:
-            return False
-    return _valid_credit_card_number
+    if re.match(credit_card_re, str(number)):
+        return number
+    else:
+        raise Invalid('Invalid credit card number')
 
 
-def valid_ip_address(length=None):
+def ip_address(ip):
     """
     Verifies that the given IP address is valid.
+
+    :param ip: An IP address
+    :type ip: str
+    :return: The given value
+    :rtype: str
+    :raises: voluptuous.Invalid
     """
-    def _valid_ip_address(ip_address):
-        if len(ip_address) == length or length is None:
-            return isinstance(ipaddress.ip_address(ip_address), (ipaddress.IPv4Address,
-                                                                 ipaddress.IPv6Address))
-        else:
-            return False
-    return _valid_ip_address
+    if isinstance(ipaddr.ip_address(ip), (ipaddr.IPv4Address,
+                                          ipaddr.IPv6Address)):
+        return ip
+    else:
+        raise Invalid('Invalid IP address')
 
 
 def decimal(number, decimal_re=DECIMAL_RE):
     """
     Verifies that the given number is a valid decimal
-    :param number:
-    :param decimal_re:
-    :return:
+
+    :param number: A number to check
+    :type number: str or decimal.Decimal
+    :param decimal_re: CONSTANT
+    :type decimal_re: _sre.SRE_Pattern
+    :return: The given value
+    :rtype: str
+    :raises: voluptuous.Invalid
     """
-    return bool(re.match(decimal_re, number))
+    if re.match(decimal_re, str(number)):
+        return str(number)
+    else:
+        raise Invalid("Not a decimal number")
 
 
-def valid_country_code(country_code):
+def country_code(country_code):
     """
     Verifies that the given two-letter country code is valid.
-    :param country_code:
-    :return:
+
+    :param country_code: A two-letter country code
+    :type country_code: str
+    :return: The passed value
+    :rtype: str
+    :raises: voluptuous.Invalid
     """
     try:
-        return bool(pycountry.countries.get(alpha2=country_code))
+        pycountry.countries.get(alpha2=country_code)
     except KeyError:
-        return False
+        raise Invalid('Invalid country code')
+    else:
+        return country_code
 
 
-def datetime(obj):
+def expiration_date(date):
     """
-    Verifies that the given object represents a date.
-    :param obj:
-    :return:
+    Verifies that the given object represents a date and that the date has not passed
+
+    :param obj: A datetime object representing an expiration date
+    :type obj: datetime.datetime
+    :return: Correctly formatted expiration date
+    :rtype: str
+    :raises: voluptuous.Invalid
     """
-    return isinstance(obj, datetime_)
+    if isinstance(date, datetime) and datetime.today() < date:
+        return date.strftime("%m%y")
+    else:
+        raise Invalid('Invalid expiration date')
+
+
+def bool_to_one_or_zero(value):
+    """
+    Converts a boolean value into an integer
+
+    :param value: A boolean value
+    :type value: bool
+    :return: 1 or 0
+    :rtype: int
+    """
+    return 1 if value else 0
+
+
+def bool_to_yes_or_no(value):
+    """
+    Converts a boolean value into a string saying "YES" or "NO"
+
+    :param value: A boolean value
+    :type value: bool
+    :return: "YES" or "NO"
+    :rtype: str
+    """
+    return "YES" if value else "NO"

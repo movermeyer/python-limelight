@@ -1,38 +1,42 @@
 # -*- coding: utf-8 -*-
 
-from voluptuous import Schema, Required, Optional, All, Length, Any
+from voluptuous import Required, Optional, All, Length, Any
 
-from ..method import TransactionMethod
-from ..validation_functions import (valid_country_code, email_address, valid_credit_card_number,
-                                    datetime, accepted_payment_type, valid_ip_address)
+from ..request import TransactionMethod
+from ..validation_functions import (country_code, email_address, credit_card_number,
+                                    expiration_date, accepted_payment_type, ip_address,
+                                    bool_to_one_or_zero, bool_to_yes_or_no)
 
 
 class NewOrder(TransactionMethod):
+    __name__ = 'NewOrder'
     schema = {Required('first_name'): All(str, Length(max=64)),
               Required('last_name'): All(str, Length(max=64)),
               Required('shipping_address1'): All(str, Length(max=64)),
               Optional('shipping_address2'): All(str, Length(max=64)),
               Required('shipping_city'): All(str, Length(max=32)),
               Required('shipping_state'): All(str, Length(max=32)),
-              Required('shipping_zip'): All(int, Length(max=10)),
-              Required('shipping_country'): All(str, valid_country_code, Length(2)),
+              Required('shipping_zip'): All(Any(str, int), lambda shipping_zip: str(shipping_zip),
+                                            Length(max=10)),
+              Required('shipping_country'): All(str, country_code, Length(2)),
               Required('billing_first_name'): All(str, Length(min=1, max=64)),
               Optional('billing_last_name'): All(str, Length(min=1, max=64)),
-              Required('billing_address1'): All(str, Length(min=1, max=64)),
-              Required('billing_address2'): All(str, Length(min=1, max=64)),
-              Required('billing_city'): All(str, Length(max=32)),
-              Required('billing_state'): All(str, Length(max=32)),
-              Required('billing_zip'): All(int, Length(max=10)),
-              Required('billing_country'): All(str, valid_country_code, Length(2)),
-              Required('phone'): All(int, Length(max=18)),
+              Optional('billing_address1'): All(str, Length(min=1, max=64)),
+              Optional('billing_address2'): All(str, Length(min=1, max=64)),
+              Optional('billing_city'): All(str, Length(max=32)),
+              Optional('billing_state'): All(str, Length(max=32)),
+              Optional('billing_zip'): All(Any(str, int), lambda billing_zip: str(billing_zip),
+                                           Length(max=10)),
+              Optional('billing_country'): All(str, country_code, Length(2)),
+              Required('phone'): All(Any(str, int), Length(max=18)),
               Required('email'): All(str, email_address, Length(max=96)),
               Required('credit_card_type'): All(str, accepted_payment_type),
-              Required('credit_card_number'): All(str, valid_credit_card_number,
+              Required('credit_card_number'): All(str, credit_card_number,
                                                   Length(max=20)),
-              Required('expiration_date'): datetime,
-              Required('cvv'): All(int, Length(min=3, max=4)),
+              Required('expiration_date'): All(expiration_date, Length(4)),
+              Required('cvv'): All(int, lambda cvv: str(cvv), Length(min=3, max=4)),
               Required('tran_type'): 'Sale',
-              Required('ip_address'): All(str, valid_ip_address, Length(max=15)),
+              Required('ip_address'): All(str, ip_address, Length(max=15)),
               Optional('AFID'): All(str, Length(max=255)),
               Optional('SID'): All(str, Length(max=255)),
               Optional('AFFID'): All(str, Length(max=255)),
@@ -45,11 +49,11 @@ class NewOrder(TransactionMethod):
               Required('product_id'): int,
               Required('campaign_id'): int,
               Required('shipping_id'): int,
-              Required('upsell_count'): bool,
+              Required('upsell_count'): All(bool, bool_to_one_or_zero),
               Optional('upsell_product_ids'): [int],
-              Optional('billing_same_as_shipping'): bool,
+              Optional('billing_same_as_shipping'): All(bool, bool_to_yes_or_no),
               Optional('notes'): All(str, Length(max=512)),
-              Optional('preserve_force_gateway'): bool,
+              Optional('preserve_force_gateway'): All(bool, bool_to_one_or_zero),
               Optional('created_by'): All(str, Length(max=100)),
               Optional('thm_session_id'): All(str, Length(max=255)),
               Optional('total_installments'): int,

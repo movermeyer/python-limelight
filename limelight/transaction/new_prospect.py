@@ -2,8 +2,8 @@
 
 from voluptuous import Required, Optional, Any, All, Length
 
-from ..method import TransactionMethod
-from ..validation_functions import valid_ip_address, valid_country_code, email_address
+from ..request import TransactionMethod
+from ..validation_functions import ip_address, country_code, email_address
 
 
 class NewProspect(TransactionMethod):
@@ -13,11 +13,11 @@ class NewProspect(TransactionMethod):
               Optional('address2'): All(str, Length(max=64)),
               Optional('city'): All(str, Length(max=32)),
               Optional('state'): All(str, Length(max=32)),
-              Optional('zip'): All(int, Length(max=10)),
-              Optional('country'): All(str, valid_country_code, Length(2)),
+              Optional('zip'): All(Any(str, int), Length(max=10)),
+              Optional('country'): All(str, country_code, Length(2)),
               Optional('phone'): All(str, Length(max=18)),
               Optional('email'): All(str, email_address, Length(max=96)),
-              Optional('ip_address'): All(str, valid_ip_address, Length(max=15)),
+              Optional('ip_address'): All(str, ip_address, Length(max=15)),
               Optional('AFID'): All(str, Length(max=255)),
               Optional('SID'): All(str, Length(max=255)),
               Optional('AFFID'): All(str, Length(max=255)),

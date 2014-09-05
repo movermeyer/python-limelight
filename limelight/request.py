@@ -1,64 +1,84 @@
 # -*- coding: utf-8 -*-
 
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib2 import urlopen
-
-# noinspection PyPep8Naming
-from socket import timeout as Timeout
-from ssl import SSLError
+from requests import post, ConnectionError, Timeout
 
 from copy import copy
 
 from voluptuous import Schema
 
 from . import utils
-from .mixins import ConversionsMixin, FieldsMixin
 
 
-class Request(ConversionsMixin, FieldsMixin):
+class Request(object):
+    """
+    The superclass of all Lime Light API methods.
+
+
+    """
     TIMEOUT = 12
     MAX_TRIES = 3
+    VERIFY_CERT = True
+    preserve_field_labels = None
+    schema = utils.not_implemented
+    endpoint = utils.not_implemented
+    error = utils.not_implemented
 
-    def __init__(self, **kwargs):
-        self.raw_response = None
+    def __init__(self, host=None, username=None, password=None, **kwargs):
+        self.host = host
+        self.username = username
+        self.password = password
+        self.response = None
         cleaned_data = Schema(self.schema)(kwargs)
         self.__make_request(cleaned_data)
 
-    def __save_response_data(self, data):
-        for k, v in data.items():
-            setattr(self, utils.to_underscore(k), utils.to_python(v))
-
-    # noinspection PyCallingNonCallable
-    def __convert_data(self, data):
-        converted_data = {}
-        for key, value in data.items():
-            conversion_func = getattr(self, "convert__{field}".format(field=key), None)
-            if key in self.unconverted_field_labels and conversion_func is None:
-                converted_data[key] = value
-            elif key in self.unconverted_field_labels and conversion_func is not None:
-                converted_data[key] = conversion_func(value)
-            elif conversion_func is not None:
-                converted_data[utils.to_camel_case(key)] = conversion_func(value)
-            else:
-                converted_data[utils.to_camel_case(key)] = value
-        return converted_data
-
     def __make_request(self, request_data, tried=0):
-        data = copy(request_data)
+        """
+        :param request_data: Data being sent over to Lime Light
+        :type request_data: dict
+        :param tried: The number of times the request has been tried so far. By default,
+                      ``__make_request`` will attempt a request three times before giving up
+        :type tried: int
+        :rtype: None
+        """
+        if self.preserve_field_labels is not None:
+            data = {}
+            for key, value in request_data.items():
+                if key in self.preserve_field_labels:
+                    data[key] = value
+                else:
+                    data[utils.to_camel_case(key)] = value
+        else:
+            data = copy(request_data)
         data.update({'method': self.__name__,
                      'username': self.username,
                      'password': self.password})
         try:
-            request = urlopen(self.endpoint,
-                              self.__convert_data(data),
-                              timeout=self.TIMEOUT)
-            self.raw_response = request.read()
-            self.parse_response(self.raw_response)
-        except (Timeout, SSLError):
+            self.response = post(self.endpoint, data=data, timeout=self.TIMEOUT,
+                                 verify=self.VERIFY_CERT)
+        except (Timeout, ConnectionError):
             if tried <= self.MAX_TRIES:
                 return self.__make_request(request_data, tried=tried + 1)
             else:
-                raise Exception
+                raise
 
+
+class TransactionMethod(Request):
+    preserve_field_labels = {'click_id', 'preserve_force_gateway', 'thm_session_id',
+                             'total_installments', 'alt_pay_token', 'alt_pay_payer_id',
+                             'force_subscription_cycle', 'recurring_days', 'subscription_week',
+                             'subscription_day', 'master_order_id', 'temp_customer_id',
+                             'auth_amount', 'cascade_enabled', 'save_customer', }
+
+    def __init__(self, **kwargs):
+        kwargs['tran_type'] = 'Sale'
+        super(TransactionMethod, self).__init__(**kwargs)
+
+    @property
+    def endpoint(self):
+        return "https://{host}/admin/transact.php".format(host=self.host)
+
+
+class MembershipMethod(Request):
+    @property
+    def endpoint(self):
+        return "https://{host}/admin/membership.php".format(host=self.host)

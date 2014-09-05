@@ -20,7 +20,7 @@ CRM.
 
 .. |build| image:: https://travis-ci.org/heropunch/python-limelight.svg
    :target: https://travis-ci.org/heropunch/python-limelight
-   :alt: Shippable
+   :alt: Travis-CI
 
 .. |license| image:: https://pypip.in/license/python-limelight/badge.png
    :target: https://pypi.python.org/pypi/python-limelight/

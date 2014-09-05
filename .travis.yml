@@ -1,17 +1,22 @@
 language: python
 python:
-    - "pypy"
-    - "pypy3"
-    - "2.7"
-    - "3.2"
-    - "3.3"
-    - "3.4"
+- pypy
+- pypy3
+- '2.7'
+- '3.2'
+- '3.3'
+- '3.4'
 install:
-    - pip install .
-    - pip install nose coverage
+- pip install .
+- pip install nose coverage
 script:
-    - nosetests --with-coverage --cover-package=limelight
-    - coverage report -m
+- nosetests --with-coverage --cover-package=limelight
+- coverage report -m
 after_success:
-    - pip install coveralls
-    - coveralls
+- pip install coveralls
+- coveralls
+env:
+  global:
+  - secure: djPQLCpXlRLkU53fiQdQwVnc+cEbPXbgYncY5AYGqc5ewEl3P8fn34l7k+Ht/Vk9Wd6f2ngXjKUGGuh6qFp8W3jl2iAQHJhyG8RVA6U3PEj9yaop9zWL+4OsMR3OkRg3/6ahCtJUk53HPBA4r184HJ+HFbB4RyBrS1X9LtFDqxE=
+  - secure: fD16D9sgKs3fHcLEEPDlVnHiqgQG/pOgmfVKPpthWWoNkcoozarG0UZPIpFAxs/5iqLqIpmhoN99MsekQzs9RNbNibanfRHx83toZ6K3tG7uhbCqII9+yjfksjuhqj895NM+kC07WngkS3cKcslF4G8eAkn7EgRgrWWiddKHmcg=
+  - secure: KoMYiLyJISxGWILr+R9UyfyoW/n/k/wkdpZWDgfgM5cE5uiCk1H1dx1Dk2LpNhp/RlrKb9R6hzMr2T/rpG6uUPgjbciHIODXibTCcDaCCHpmp/6th+Eq8RITp8hedIebHrViA+X052wE7PURTHSat0G90ktsIDIM1nQNJmtviQc=
