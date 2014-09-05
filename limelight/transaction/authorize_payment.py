@@ -9,6 +9,7 @@ from ..validation_functions import (email_address, ip_address, country_code,
 
 
 class AuthorizePayment(TransactionMethod):
+    __name__ = 'authorize_payment'
     schema = {Required('billing_first_name'): All(str, Length(min=1, max=64)),
               Optional('billing_last_name'): All(str, Length(min=1, max=64)),
               Required('billing_address1'): All(str, Length(min=1, max=64)),

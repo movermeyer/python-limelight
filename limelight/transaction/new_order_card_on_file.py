@@ -6,6 +6,7 @@ from ..request import TransactionMethod
 
 
 class NewOrderCardOnFile(TransactionMethod):
+    __name__ = 'NewOrderCardOnFile'
     schema = {Required('tran_type'): 'Sale',
               Optional('click_id'): All(str, Length(max=255)),
               Required('product_id'): int,

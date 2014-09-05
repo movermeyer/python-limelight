@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from requests import post, ConnectionError, Timeout
+from requests import post, get, ConnectionError, Timeout
 
 from copy import copy
 
 from voluptuous import Schema
 
-from . import utils
+from . import utils, errors
 
 
 class Request(object):
@@ -19,6 +19,7 @@ class Request(object):
     MAX_TRIES = 3
     VERIFY_CERT = True
     preserve_field_labels = None
+    http_method = 'POST'
     schema = utils.not_implemented
     endpoint = utils.not_implemented
     error = utils.not_implemented
@@ -53,8 +54,15 @@ class Request(object):
                      'username': self.username,
                      'password': self.password})
         try:
-            self.response = post(self.endpoint, data=data, timeout=self.TIMEOUT,
-                                 verify=self.VERIFY_CERT)
+            if self.http_method.upper() == 'POST':
+                self.response = post(self.endpoint, data=data, timeout=self.TIMEOUT,
+                                     verify=self.VERIFY_CERT)
+            elif self.http_method.upper() == 'GET':
+                self.response = get(self.endpoint, params=data, timeout=self.TIMEOUT,
+                                    verify=self.VERIFY_CERT)
+            else:
+                raise errors.ImproperlyConfigured(self.__name__, '.http_method should be one of ',
+                                                  '"GET" or "POST"')
         except (Timeout, ConnectionError):
             if tried <= self.MAX_TRIES:
                 return self.__make_request(request_data, tried=tried + 1)

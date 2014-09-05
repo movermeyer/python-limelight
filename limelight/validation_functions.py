@@ -7,6 +7,8 @@ import re
 
 from datetime import datetime
 
+from six import u
+
 from voluptuous import Invalid
 
 from validate_email_address import validate_email
@@ -90,8 +92,8 @@ def ip_address(ip):
     :rtype: str
     :raises: voluptuous.Invalid
     """
-    if isinstance(ipaddr.ip_address(ip), (ipaddr.IPv4Address,
-                                          ipaddr.IPv6Address)):
+    if isinstance(ipaddr.ip_address(u(ip)), (ipaddr.IPv4Address,
+                                             ipaddr.IPv6Address)):
         return ip
     else:
         raise Invalid('Invalid IP address')
@@ -115,22 +117,22 @@ def decimal(number, decimal_re=DECIMAL_RE):
         raise Invalid("Not a decimal number")
 
 
-def country_code(country_code):
+def country_code(code):
     """
     Verifies that the given two-letter country code is valid.
 
-    :param country_code: A two-letter country code
-    :type country_code: str
+    :param code: A two-letter country code
+    :type code: str
     :return: The passed value
     :rtype: str
     :raises: voluptuous.Invalid
     """
     try:
-        pycountry.countries.get(alpha2=country_code)
+        pycountry.countries.get(alpha2=code)
     except KeyError:
         raise Invalid('Invalid country code')
     else:
-        return country_code
+        return code
 
 
 def expiration_date(date):

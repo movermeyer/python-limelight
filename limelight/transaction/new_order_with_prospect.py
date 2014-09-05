@@ -9,6 +9,7 @@ from ..validation_functions import (country_code, email_address, accepted_paymen
 
 
 class NewOrderWithProspect(TransactionMethod):
+    __name__ = 'NewOrderWithProspect'
     schema = {Optional('first_name'): All(str, Length(max=64)),
               Optional('last_name'): All(str, Length(max=64)),
               Optional('shipping_address1'): All(str, Length(max=64)),

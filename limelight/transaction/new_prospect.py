@@ -7,6 +7,7 @@ from ..validation_functions import ip_address, country_code, email_address
 
 
 class NewProspect(TransactionMethod):
+    __name__ = 'NewProspect'
     schema = {Optional('first_name'): All(str, Length(max=64)),
               Optional('last_name'): All(str, Length(max=64)),
               Optional('address1'): All(str, Length(max=64)),

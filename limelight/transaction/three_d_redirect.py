@@ -11,8 +11,5 @@ class ThreeDRedirect(TransactionMethod):
 
     :param order_id: order_id that is in 3DS wait order status
     """
-    @property
-    def __name__(self):
-        return 'three_d_redirect'
-
+    __name__ = 'three_d_redirect'
     schema = {Required('order_id'): int}

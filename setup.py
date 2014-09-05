@@ -36,4 +36,5 @@ setup(name='python-limelight',
                         'requests',
                         'ipaddress',
                         'voluptuous',
-                        'pycountry', ))
+                        'pycountry',
+                        'six', ))
