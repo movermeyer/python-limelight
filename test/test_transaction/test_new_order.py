@@ -16,4 +16,4 @@ class TestNewOrder(TestCase):
 
     def test_place_order(self):
         result = self.client.NewOrder(**test_order)
-        print(result)
+        self.assertEqual(result.response_code, 100)

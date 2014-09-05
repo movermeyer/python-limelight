@@ -48,6 +48,8 @@ class Request(object):
         :return: Data ready to be transmitted
         :rtype: dict
         """
+        if unprocessed_data.get('tran_type') and unprocessed_data.get('cvv'):
+            unprocessed_data['CVV'] = unprocessed_data.pop('cvv')
         if self.preserve_field_labels is not None:
             data = {}
             for key, value in unprocessed_data.items():
@@ -102,14 +104,15 @@ class Request(object):
 
     # noinspection PyUnresolvedReferences
     def __handle_errors(self):
-        if self.response_code == 800:
-            raise errors.TransactionDeclined(self.decline_reason)
-        else:
-            response_code = getattr(self, 'response_code', '000')
-            error_message = getattr(self, 'error_message',
-                                    'An unspecified error occurred, try again.')
-            raise errors.LimeLightException("{code}: {message}".format(code=response_code,
-                                                                       message=error_message))
+        if self.error_found:
+            if self.response_code == 800:
+                raise errors.TransactionDeclined(self.decline_reason)
+            else:
+                response_code = getattr(self, 'response_code', '000')
+                error_message = getattr(self, 'error_message',
+                                        'An unspecified error occurred, try again.')
+                raise errors.LimeLightException("{code}: {message}".format(code=response_code,
+                                                                           message=error_message))
 
 
 class TransactionMethod(Request):
@@ -125,6 +128,7 @@ class TransactionMethod(Request):
     def __init__(self, **kwargs):
         if self.__name__ != 'NewProspect':
             kwargs['tran_type'] = 'Sale'
+
         super(TransactionMethod, self).__init__(**kwargs)
 
     @property

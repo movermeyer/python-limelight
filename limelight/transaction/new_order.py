@@ -28,7 +28,7 @@ class NewOrder(TransactionMethod):
               Optional('billing_zip'): All(Any(str, int), lambda billing_zip: str(billing_zip),
                                            Length(max=10)),
               Optional('billing_country'): All(str, country_code, Length(2)),
-              Required('phone'): All(Any(str, int), Length(max=18)),
+              Required('phone'): All(Any(str, int), lambda phone: str(phone), Length(max=18)),
               Required('email'): All(str, email_address, Length(max=96)),
               Required('credit_card_type'): All(str, accepted_payment_type),
               Required('credit_card_number'): All(str, credit_card_number,

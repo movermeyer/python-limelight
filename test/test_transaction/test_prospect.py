@@ -15,6 +15,10 @@ class TestProspect(TestCase):
                                password=os.environ['LIMELIGHT_PASSWORD'])
 
     def test_new_prospect(self):
-        result = self.client.NewProspect(campaign_id=test_order['campaign_id'],
-                                         ip_address=test_order['ip_address'], **test_user)
-        self.assertIn("100", result.response.text)
+        new_prospect_result = self.client.NewProspect(campaign_id=test_order['campaign_id'],
+                                                      ip_address=test_order['ip_address'],
+                                                      **test_user)
+        self.assertEqual(new_prospect_result.response_code, 100)
+        result = self.client.NewOrderWithProspect(prospect_id=new_prospect_result.prospect_id,
+                                                  **test_order)
+        self.assertEqual(result.response_code, 100)

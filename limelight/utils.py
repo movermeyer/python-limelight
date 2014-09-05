@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+import six
 
 __all__ = ['not_implemented', 'to_python', 'to_camel_case', 'to_underscore']
 
@@ -44,13 +45,18 @@ def to_python(var):
     May be more generic in the future
     :param var:
     """
-    var = var[0] if isinstance(var, list) else var
-    if not isinstance(var, str):
+    var = var[0] if isinstance(var, list) and len(var) == 1 else var
+    if not isinstance(var, six.string_types):
         return var
     elif NUM_RE.match(var):
-        return int(var)
+        if int(var) == 1:
+            return True
+        elif int(var) == 0:
+            return False
+        else:
+            return int(var)
     elif FLOAT_RE.match(var):
-        return float(var)
+        return float(var)  # Maybe this should be decimal.Decimal?
     else:
         return var
 
