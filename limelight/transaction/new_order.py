@@ -19,7 +19,7 @@ class NewOrder(TransactionMethod):
               Required('shipping_zip'): All(Any(str, int), lambda shipping_zip: str(shipping_zip),
                                             Length(max=10)),
               Required('shipping_country'): All(str, country_code, Length(2)),
-              Required('billing_first_name'): All(str, Length(min=1, max=64)),
+              Optional('billing_first_name'): All(str, Length(min=1, max=64)),
               Optional('billing_last_name'): All(str, Length(min=1, max=64)),
               Optional('billing_address1'): All(str, Length(min=1, max=64)),
               Optional('billing_address2'): All(str, Length(min=1, max=64)),

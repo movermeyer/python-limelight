@@ -9,7 +9,12 @@ An object-oriented API wrapper for `Lime Light CRM`_
 .. _Lime Light CRM: https://www.limelightcrm.com
 """
 
+import sys
+
 from setuptools import setup
+
+PY2 = sys.version_info[0] == 2
+PY3 = sys.version_info[0] == 3
 
 setup(name='python-limelight',
       version='1',
@@ -19,7 +24,7 @@ setup(name='python-limelight',
       license='MIT',
       author='Carlos Killpack',
       author_email='carlos.killpack@rocketmail.com',
-      packages=('limelight', ),
+      packages=('limelight', 'limelight.transaction', 'limelight.membership'),
       classifiers=('Environment :: Web Environment',
                    'Topic :: Internet',
                    'Topic :: Office/Business',
@@ -28,7 +33,7 @@ setup(name='python-limelight',
                    'Topic :: Office/Business :: Financial :: Investment',
                    'Topic :: Office/Business :: Financial :: Point-Of-Sale',
                    'License :: OSI Approved',
-                   'License :: OSI Approved :: MIT',
+                   'License :: OSI Approved :: MIT License',
                    'Programming Language :: Python :: 2',
                    'Programming Language :: Python :: 3',
                    'Programming Language :: Python :: Implementation :: PyPy', ),

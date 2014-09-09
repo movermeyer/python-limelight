@@ -92,14 +92,11 @@ def ip_address(ip):
     :rtype: str
     :raises: voluptuous.Invalid
     """
-    try:
-        if isinstance(ipaddr.ip_address(u(ip)), (ipaddr.IPv4Address,
-                                                 ipaddr.IPv6Address)):
-            return ip
-        else:
-            raise Invalid('Invalid IP address')
-    except SyntaxError:  # Avoids an error involving unicode literals in Python 3.2
+    if isinstance(ipaddr.ip_address(u(ip)), (ipaddr.IPv4Address,
+                                             ipaddr.IPv6Address)):
         return ip
+    else:
+        raise Invalid('Invalid IP address')
 
 
 def decimal(number, decimal_re=DECIMAL_RE):

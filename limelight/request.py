@@ -10,6 +10,7 @@ except ImportError:
     from urlparse import parse_qs
 
 from requests import post, get, ConnectionError, Timeout
+from requests.packages.urllib3.exceptions import ProtocolError
 
 from voluptuous import Schema, MultipleInvalid
 
@@ -73,7 +74,7 @@ class Request(object):
         :type tried: int
         :return: Lime Light's response
         :rtype: requests.Response
-        :raises: requests.Timeout or requests.ConnectionError
+        :raises: limelight.errors.ConnectionError
         """
         data = self.__preprocess_data(request_data)
         try:
@@ -85,7 +86,7 @@ class Request(object):
             else:
                 msg = '`{cls}.http_method` must be one of `GET` or `POST`'.format(cls=self.__name__)
                 raise errors.ImproperlyConfigured(msg)
-        except (Timeout, ConnectionError) as e:
+        except (Timeout, ConnectionError, ProtocolError) as e:
             if tried <= self.MAX_TRIES:
                 return self.__make_request(request_data, tried=tried + 1)
             else:
