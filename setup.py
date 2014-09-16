@@ -17,7 +17,7 @@ PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
 
 setup(name='python-limelight',
-      version='1',
+      version='1.1',
       description='A pythonic Lime Light API wrapper',
       long_description=open('README.rst', 'r').read(),
       url='https://github.com/heropunch/python-limelight',
