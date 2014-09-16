@@ -23,7 +23,7 @@ class AuthorizePayment(TransactionMethod):
               Required('credit_card_type'): All(str, accepted_payment_type),
               Required('credit_card_number'): All(credit_card_number, Length(max=20)),
               Required('expiration_date'): All(expiration_date, Length(4)),
-              Required('cvv'): All(int, Length(min=3, max=4)),
+              Required('cvv'): All(str, Length(min=3, max=4)),
               Required('ip_address'): All(ip_address, Length(max=15)),
               Required('product_id'): int,
               Required('campaign_id'): int,

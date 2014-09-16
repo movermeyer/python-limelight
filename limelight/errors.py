@@ -22,5 +22,9 @@ class TransactionDeclined(LimeLightException):
     pass
 
 
+class CouldNotFindProspectRecord(LimeLightException):
+    pass
+
+
 class ValidationError(LimeLightException):
     pass

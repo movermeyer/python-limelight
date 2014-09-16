@@ -17,9 +17,12 @@ def capitalize(name):
 
 
 # noinspection PyUnusedLocal
-@property
-def not_implemented(self):
+def func_not_implemented(*args, **kwargs):
+    """A placeholder for properties and methods that should be defined in a subclass"""
     raise NotImplementedError
+
+
+not_implemented = property(func_not_implemented)
 
 
 def to_underscore(name, initial_cap=False):

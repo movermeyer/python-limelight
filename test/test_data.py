@@ -28,7 +28,7 @@ test_credit_card = dict(
     credit_card_type="visa",
     credit_card_number='4444585412324564',
     expiration_date=A_YEAR_FROM_NOW,
-    cvv=randrange(100, 9999),
+    cvv=str(randrange(100, 9999)),
     billing_first_name=test_user['first_name'],
     billing_last_name=test_user['last_name']
 )

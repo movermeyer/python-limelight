@@ -34,7 +34,7 @@ class NewOrderWithProspect(TransactionMethod):
               Required('credit_card_number'): All(str, credit_card_number,
                                                   Length(max=20)),
               Required('expiration_date'): All(expiration_date, Length(4)),
-              Required('cvv'): All(Any(str, int), lambda cvv: str(cvv), Length(min=3, max=4)),
+              Required('cvv'): All(str, Length(min=3, max=4)),
               Required('tran_type'): 'Sale',
               Optional('ip_address'): All(str, ip_address, Length(max=15)),
               Optional('AFID'): All(str, Length(max=255)),

@@ -29,6 +29,7 @@ class Request(object):
     schema = utils.not_implemented
     endpoint = utils.not_implemented
     error = utils.not_implemented
+    handle_errors = utils.func_not_implemented
 
     def __init__(self, host=None, username=None, password=None, **kwargs):
         self.host = host
@@ -105,10 +106,11 @@ class Request(object):
 
     # noinspection PyUnresolvedReferences
     def __handle_errors(self):
-        if self.error_found:
-            if self.response_code == 800:
-                raise errors.TransactionDeclined(self.decline_reason)
-            else:
+        """Handles generic Lime Light errors"""
+        try:
+            self.handle_errors()
+        except (AttributeError, NotImplementedError):
+            if self.error_found:
                 response_code = getattr(self, 'response_code', '000')
                 error_message = getattr(self, 'error_message',
                                         'An unspecified error occurred, try again.')
@@ -120,6 +122,7 @@ class TransactionMethod(Request):
     """
     Superclass of all Transaction API methods
     """
+    Declined = errors.TransactionDeclined
     preserve_field_labels = {'click_id', 'preserve_force_gateway', 'thm_session_id',
                              'total_installments', 'alt_pay_token', 'alt_pay_payer_id',
                              'force_subscription_cycle', 'recurring_days', 'subscription_week',
@@ -129,8 +132,20 @@ class TransactionMethod(Request):
     def __init__(self, **kwargs):
         if self.__name__ != 'NewProspect':
             kwargs['tran_type'] = 'Sale'
-
         super(TransactionMethod, self).__init__(**kwargs)
+
+    # noinspection PyUnresolvedReferences
+    def handle_errors(self):
+        """
+        Raises exceptions for Transaction API-related errors.
+
+        :return:
+        """
+        if self.error_found:
+            if self.response_code == 800:
+                raise self.Declined(self.decline_reason)
+            else:
+                pass
 
     @property
     def endpoint(self):
