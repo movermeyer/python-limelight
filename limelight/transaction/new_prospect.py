@@ -1,32 +1,32 @@
 # -*- coding: utf-8 -*-
 
-from voluptuous import Required, Optional, Any, All, Length
+from voluptuous import Required, Optional
 
+from ._schema import condition_for
 from ..request import TransactionMethod
-from ..validation_functions import ip_address, country_code, email_address
 
 
 class NewProspect(TransactionMethod):
     __name__ = 'NewProspect'
-    schema = {Optional('first_name'): All(str, Length(max=64)),
-              Optional('last_name'): All(str, Length(max=64)),
-              Optional('address1'): All(str, Length(max=64)),
-              Optional('address2'): All(str, Length(max=64)),
-              Optional('city'): All(str, Length(max=32)),
-              Optional('state'): All(str, Length(max=32)),
-              Optional('zip'): All(Any(str, int), Length(max=10)),
-              Optional('country'): All(str, country_code, Length(2)),
-              Optional('phone'): All(str, Length(max=18)),
-              Required('email'): All(str, email_address, Length(max=96)),
-              Required('ip_address'): All(str, ip_address, Length(max=15)),
-              Optional('AFID'): All(str, Length(max=255)),
-              Optional('SID'): All(str, Length(max=255)),
-              Optional('AFFID'): All(str, Length(max=255)),
-              Optional('C1'): All(str, Length(max=255)),
-              Optional('C2'): All(str, Length(max=255)),
-              Optional('C3'): All(str, Length(max=255)),
-              Optional('AID'): All(str, Length(max=255)),
-              Optional('OPT'): All(str, Length(max=255)),
-              Optional('click_id'): All(str, Length(max=255)),
-              Required('campaign_id'): int,
-              Optional('notes'): All(str, Length(max=512)), }
+    schema = {Optional('first_name'): condition_for['first_name'],
+              Optional('last_name'): condition_for['last_name'],
+              Optional('address1'): condition_for['address1'],
+              Optional('address2'): condition_for['address2'],
+              Optional('city'): condition_for['city'],
+              Optional('state'): condition_for['state'],
+              Optional('zip'): condition_for['zip'],
+              Optional('country'): condition_for['country'],
+              Optional('phone'): condition_for['phone'],
+              Required('email'): condition_for['email'],
+              Required('ip_address'): condition_for['ip_address'],
+              Optional('AFID'): condition_for['AFID'],
+              Optional('SID'): condition_for['SID'],
+              Optional('AFFID'): condition_for['AFFID'],
+              Optional('C1'): condition_for['C1'],
+              Optional('C2'): condition_for['C2'],
+              Optional('C3'): condition_for['C3'],
+              Optional('AID'): condition_for['AID'],
+              Optional('OPT'): condition_for['OPT'],
+              Optional('click_id'): condition_for['click_id'],
+              Required('campaign_id'): condition_for['campaign_id'],
+              Optional('notes'): condition_for['notes'], }

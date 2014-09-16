@@ -2,6 +2,7 @@
 
 from voluptuous import Required
 
+from ._schema import condition_for
 from ..request import TransactionMethod
 
 
@@ -16,4 +17,4 @@ class ThreeDRedirect(TransactionMethod):
         super(ThreeDRedirect, self).__init__(**kwargs)
 
     __name__ = 'three_d_redirect'
-    schema = {Required('order_id'): int}
+    schema = {Required('order_id'): condition_for['order_id']}
