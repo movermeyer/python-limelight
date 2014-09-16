@@ -3,7 +3,7 @@
 import re
 import six
 
-__all__ = ['not_implemented', 'to_python', 'to_camel_case', 'to_underscore']
+__all__ = ['func_not_implemented', 'not_implemented', 'to_python', 'to_camel_case', 'to_underscore']
 
 
 CAMEL_RE = re.compile(r'([A-Z])')
@@ -13,6 +13,7 @@ FLOAT_RE = re.compile(r'^[0-9]*?\.[0-9]+$')
 
 
 def capitalize(name):
+    """Capitalize"""
     return name[0].upper() + name[1:]
 
 
@@ -46,7 +47,8 @@ def to_python(var):
     Converts strings that are really numbers to ints or floats
 
     May be more generic in the future
-    :param var:
+    :param var: a string
+    :type var: six.string_types
     """
     var = var[0] if isinstance(var, list) and len(var) == 1 else var
     if not isinstance(var, six.string_types):
@@ -61,5 +63,5 @@ def to_python(var):
     elif FLOAT_RE.match(var):
         return float(var)  # Maybe this should be decimal.Decimal?
     else:
-        return var
+        return six.u(var)
 

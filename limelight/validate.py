@@ -92,8 +92,7 @@ def ip_address(ip):
     :rtype: str
     :raises: voluptuous.Invalid
     """
-    if isinstance(ipaddr.ip_address(u(ip)), (ipaddr.IPv4Address,
-                                             ipaddr.IPv6Address)):
+    if isinstance(ipaddr.ip_address(ip), (ipaddr.IPv4Address, ipaddr.IPv6Address)):
         return ip
     else:
         raise Invalid('Invalid IP address')
@@ -112,7 +111,7 @@ def decimal(number, decimal_re=DECIMAL_RE):
     :raises: voluptuous.Invalid
     """
     if re.match(decimal_re, str(number)):
-        return str(number)
+        return u(str(number))
     else:
         raise Invalid("Not a decimal number")
 
@@ -146,7 +145,7 @@ def expiration_date(date):
     :raises: voluptuous.Invalid
     """
     if isinstance(date, datetime) and datetime.today() < date:
-        return date.strftime("%m%y")
+        return u(date.strftime("%m%y"))
     else:
         raise Invalid('Invalid expiration date')
 
@@ -172,4 +171,4 @@ def bool_to_yes_or_no(value):
     :return: "YES" or "NO"
     :rtype: str
     """
-    return "YES" if value else "NO"
+    return u("YES") if value else u("NO")
