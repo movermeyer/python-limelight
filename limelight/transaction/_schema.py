@@ -57,17 +57,13 @@ condition_for = {'first_name': All(six.u, Length(max=64)),
                  'master_order_id': int,
                  'promo_code': All(six.u, Length(max=100)),
                  'temp_customer_id': All(six.u, Length(max=32)),
-                 # authorize_payment
-                 'auth_amount': validate.decimal,
+                 'auth_amount': validate.decimal,                             # authorize_payment
                  'cascade_enabled': All(bool, validate.bool_to_one_or_zero),
                  'save_customer': All(bool, validate.bool_to_one_or_zero),
-                 # NewOrderWithProspect
-                 'prospect_id': int,
-                 # three_d_redirect
-                 'order_id': int, }
+                 'prospect_id': int,                                          # NewOrderWithProspect
+                 'order_id': int, }                                           # three_d_redirect
 
-# Duplicate conditions
-condition_for.update({'shipping_address1': condition_for['address1'],
+condition_for.update({'shipping_address1': condition_for['address1'],         # Duplicate conditions
                       'shipping_address2': condition_for['address2'],
                       'shipping_city': condition_for['city'],
                       'shipping_state': condition_for['state'],

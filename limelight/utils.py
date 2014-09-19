@@ -63,5 +63,5 @@ def to_python(var):
     elif FLOAT_RE.match(var):
         return float(var)  # Maybe this should be decimal.Decimal?
     else:
-        return six.u(var)
+        return var if isinstance(var, six.text_type) else six.u(var)
 

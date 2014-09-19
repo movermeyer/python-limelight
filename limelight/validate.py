@@ -134,18 +134,41 @@ def country_code(code):
         return code
 
 
-def expiration_date(date):
+def date(format_):
+    """
+    :param format_: An strftime-style date-formatting string
+    :type format_: str
+    :return: A datetime validation function
+    :rtype: types.FunctionType
+    """
+    def _date(date_):
+        """
+        :param date_: A datetime object
+        :type date_: datetime.datetime
+        :return: Date formatted as specified
+        :rtype: str
+        :raises: voluptuous.Invalid
+        """
+        if isinstance(date_, datetime):
+            return u(date_.strftime(format_))
+        else:
+            raise Invalid("Invalid date")
+    return _date
+
+
+def expiration_date(date_):
     """
     Verifies that the given object represents a date and that the date has not passed
 
-    :param date: A datetime object representing an expiration date
-    :type date: datetime.datetime
+    :param date_: A datetime object representing an expiration date
+    :type date_: datetime.datetime
     :return: Correctly formatted expiration date
     :rtype: str
     :raises: voluptuous.Invalid
     """
-    if isinstance(date, datetime) and datetime.today() < date:
-        return u(date.strftime("%m%y"))
+    date_format = date("%m%y")
+    if date_format(date_) and datetime.today() < date_:
+        return date_format(date_)
     else:
         raise Invalid('Invalid expiration date')
 

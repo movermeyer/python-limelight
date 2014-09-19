@@ -23,7 +23,10 @@ class TestNewOrder(TestCase):
 
     def test_place_order(self):
         result = self.client.NewOrder(**self.test_order)
+        self.assertEqual(result.error_found, 0)
         self.assertEqual(result.response_code, 100)
+        self.assertIsInstance(result.customer_id, int)
+        self.assertIsInstance(result.order_id, int)
 
     def test_place_declined_order(self):
         with self.assertRaises(TransactionDeclined):

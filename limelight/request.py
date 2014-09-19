@@ -35,11 +35,14 @@ class Request(object):
         self.host = host
         self.username = username
         self.password = password
+        if kwargs.get('http_method'):
+            self.http_method = kwargs['http_method']
         try:
             cleaned_data = Schema(self.schema)(kwargs)
         except MultipleInvalid as e:
             raise errors.ValidationError(e)
-        self.response = self.__make_request(cleaned_data)
+        preprocessed_data = self.__preprocess_data(cleaned_data)
+        self.response = self.__make_request(preprocessed_data)
         self.__process_response()
         self.__handle_errors()
 
@@ -77,12 +80,12 @@ class Request(object):
         :rtype: requests.Response
         :raises: limelight.errors.ConnectionError
         """
-        data = self.__preprocess_data(request_data)
         try:
             if self.http_method.upper() == 'POST':
-                return post(self.endpoint, data=data, timeout=self.TIMEOUT, verify=self.VERIFY_CERT)
+                return post(self.endpoint, data=request_data, timeout=self.TIMEOUT,
+                            verify=self.VERIFY_CERT)
             elif self.http_method.upper() == 'GET':
-                return get(self.endpoint, params=data, timeout=self.TIMEOUT,
+                return get(self.endpoint, params=request_data, timeout=self.TIMEOUT,
                            verify=self.VERIFY_CERT)
             else:
                 msg = '`{cls}.http_method` must be one of `GET` or `POST`'.format(cls=self.__name__)
