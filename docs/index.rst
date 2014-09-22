@@ -1,16 +1,17 @@
-.. python-limelight documentation master file, created by
-   sphinx-quickstart on Mon Sep 22 14:18:49 2014.
+.. limelight documentation master file, created by
+   sphinx-quickstart on Mon Sep 22 14:39:23 2014.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to python-limelight's documentation!
-============================================
+Welcome to limelight's documentation!
+=====================================
 
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
+   limelight
 
 
 Indices and tables
