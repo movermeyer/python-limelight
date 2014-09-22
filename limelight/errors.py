@@ -2,7 +2,15 @@
 
 
 class LimeLightException(Exception):
-    pass
+    def __init__(self, *args, **kwargs):
+        """
+        :param response: A reference to the request object that raised the exception
+        :type response: limelight.request.Request
+        """
+        response = kwargs.pop('response', None)
+        if response is not None:
+            self.response = response
+        super(LimeLightException, self).__init__(*args, **kwargs)
 
 
 class ImproperlyConfigured(LimeLightException):

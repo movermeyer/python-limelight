@@ -118,7 +118,8 @@ class Request(object):
                 error_message = getattr(self, 'error_message',
                                         'An unspecified error occurred, try again.')
                 raise errors.LimeLightException("{code}: {message}".format(code=response_code,
-                                                                           message=error_message))
+                                                                           message=error_message),
+                                                response=self)
 
 
 class TransactionMethod(Request):
@@ -146,7 +147,8 @@ class TransactionMethod(Request):
         """
         if self.error_found:
             if self.response_code == 800:
-                raise self.Declined(self.decline_reason)
+                raise self.Declined(self.decline_reason,
+                                    response=self)
             else:
                 pass
 

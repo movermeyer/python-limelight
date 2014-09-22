@@ -29,5 +29,10 @@ class TestNewOrder(TestCase):
         self.assertIsInstance(result.order_id, int)
 
     def test_place_declined_order(self):
-        with self.assertRaises(TransactionDeclined):
+        try:
             self.client.NewOrder(**self.declined_order)
+        except TransactionDeclined as e:
+            self.assertEqual(e.response.error_found, 1)
+            self.assertEqual(e.response.response_code, 800)
+            with self.assertRaises(TransactionDeclined):
+                raise e
