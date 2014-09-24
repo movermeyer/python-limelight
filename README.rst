@@ -18,6 +18,31 @@ Our solution is designed for both flexibility and ease of use: the entire API is
 in the aforementioned modules and is used as machinery for a much more cohesive interface to the
 CRM.
 
+Additionally, ``python-limelight`` implements extensive client-side data validation to limit the
+amount of time spent waiting for a response (which can take up to *thirty seconds*).
+
+Installation
+~~~~~~~~~~~~
+
+``python-limelight`` is available on PyPi:
+
+    pip install python-limelight
+
+Though, for the time being we recommend you track the git repo:
+
+    pip install git+https://github.com/heropunch/python-limelight.git@master
+
+Making API Calls
+~~~~~~~~~~~~~~~~
+
+    >>> import os
+    >>> from limelight.api import TransactionClient
+    >>> client = TransactionClient(host=os.environ['LIMELIGHT_HOST'],
+                                   username=os.environ['LIMELIGHT_USER'],
+                                   password=os.environ['LIMELIGHT_PASSWORD'])
+    >>> client.NewOrder(**order_data)
+    <limelight.transaction.new_order.NewOrder object at 0x106f8a1d0>
+
 .. |build| image:: https://travis-ci.org/heropunch/python-limelight.svg
    :target: https://travis-ci.org/heropunch/python-limelight
    :alt: Travis-CI
