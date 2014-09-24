@@ -63,6 +63,34 @@ over the place. It's comprehensive and useful, but not well organized or consist
 <p>Our solution is designed for both flexibility and ease of use: the entire API is exposed in python
 in the aforementioned modules and is used as machinery for a much more cohesive interface to the
 CRM.</p>
+
+<p>Additionally, <code>python-limelight</code> implements extensive client-side data validation to limit the
+amount of time spent waiting for a response (which can take up to <em>thirty seconds</em>).</p>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p><code>python-limelight</code> is available on PyPi:</p>
+
+<pre><code>pip install python-limelight
+</code></pre>
+
+<p>Though, for the time being we recommend you track the git repo:</p>
+
+<pre><code>pip install git+https://github.com/heropunch/python-limelight.git@master
+</code></pre>
+
+<h2>
+<a name="making-api-calls" class="anchor" href="#making-api-calls"><span class="octicon octicon-link"></span></a>Making API Calls</h2>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">os</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">limelight.api</span> <span class="kn">import</span> <span class="n">TransactionClient</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">client</span> <span class="o">=</span> <span class="n">TransactionClient</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">'LIMELIGHT_HOST'</span><span class="p">],</span>
+                               <span class="n">username</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">'LIMELIGHT_USER'</span><span class="p">],</span>
+                               <span class="n">password</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">'LIMELIGHT_PASSWORD'</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">client</span><span class="o">.</span><span class="n">NewOrder</span><span class="p">(</span><span class="o">**</span><span class="n">order_data</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="n">limelight</span><span class="o">.</span><span class="n">transaction</span><span class="o">.</span><span class="n">new_order</span><span class="o">.</span><span class="n">NewOrder</span> <span class="nb">object</span> <span class="n">at</span> <span class="mh">0x106f8a1d0</span><span class="o">&gt;</span>
+</pre></div>
       </section>
 
       <footer>
