@@ -8,9 +8,8 @@ class LimeLightException(Exception):
         :type response: limelight.request.Request
         """
         response = kwargs.pop('response', None)
-        if response is not None:
-            self.response = response
         super(LimeLightException, self).__init__(*args, **kwargs)
+        self.response = response
 
 
 class ImproperlyConfigured(LimeLightException):
