@@ -43,8 +43,8 @@ Making API Calls
     >>> client.NewOrder(**order_data)
     <limelight.transaction.new_order.NewOrder object at 0x106f8a1d0>
 
-.. |build| image:: https://travis-ci.org/heropunch/python-limelight.svg
-   :target: https://travis-ci.org/heropunch/python-limelight
+.. |build| image:: https://travis-ci.org/zulumarketing/python-limelight.svg?branch=master
+   :target: https://travis-ci.org/zulumarketing/python-limelight
    :alt: Travis-CI
 
 .. |license| image:: https://pypip.in/license/python-limelight/badge.png
