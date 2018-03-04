@@ -47,10 +47,10 @@ Making API Calls
    :target: https://travis-ci.org/zulumarketing/python-limelight
    :alt: Travis-CI
 
-.. |license| image:: https://pypip.in/license/python-limelight/badge.png
+.. |license| image:: https://img.shields.io/pypi/l/python-limelight.svg
    :target: https://pypi.python.org/pypi/python-limelight/
    :alt: License
 
-.. |downloads| image:: https://pypip.in/download/python-limelight/badge.png
+.. |downloads| image:: https://img.shields.io/pypi/dm/python-limelight.svg
    :target: https://pypi.python.org/pypi/python-limelight/
    :alt: Downloads
